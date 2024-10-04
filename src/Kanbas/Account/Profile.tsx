@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import './style.css';  // 导入 CSS 文件
+import './style.css';
 
 export default function Profile() {
   return (

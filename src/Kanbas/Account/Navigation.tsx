@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import "./Navigation.css"; // 修改为导入CSS文件
+import "./Navigation.css";
 
 export default function AccountNavigation() {
   return (
