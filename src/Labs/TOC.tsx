@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 export default function TOC() {
     return (
         <div>
-            <a href="https://github.com/HaoCaiSCU/kanbas-react-web-app" id="wd-github" target="_blank">
+            <a
+                href="https://github.com/HaoCaiSCU/kanbas-react-web-app"
+                id="wd-github"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 My GitHub
             </a>
             <br />
