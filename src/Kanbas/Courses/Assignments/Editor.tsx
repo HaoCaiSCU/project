@@ -22,7 +22,7 @@ export default function AssignmentEditor() {
             <label htmlFor="wd-name"><b>Assignment Name</b></label><br /><br />
             <input
                 id="wd-name"
-                value={assignment.title}  // Updated from 'name' to 'title'
+                value={assignment.title} 
                 className="form-control"
                 readOnly
             /><br /><br />
@@ -32,7 +32,7 @@ export default function AssignmentEditor() {
                 className="form-control"
                 cols={45}
                 rows={9}
-                value={assignment.description || 'No description provided.'}  // Optional description
+                value={assignment.description || 'N/P'} 
                 readOnly
             ></textarea><br /><br />
 
