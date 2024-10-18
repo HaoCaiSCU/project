@@ -19,10 +19,10 @@ export default function CoursesNavigation() {
             {links.map((link) => (
                 <Link
                     key={link.path}
-                    to={`/Kanbas/Courses/${cid}/${link.path}`}  // Dynamic course ID and path
+                    to={`/Kanbas/Courses/${cid}/${link.path}`} 
                     id={`wd-course-${link.path.toLowerCase()}-link`}
                     className={`list-group-item border border-0 ${pathname.includes(link.path) ? "active" : "text-danger"
-                        }`}  // Highlight the active link
+                        }`} 
                 >
                     {link.label}
                 </Link>
