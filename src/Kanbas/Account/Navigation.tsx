@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import "./Navigation.css";
 
 export default function AccountNavigation() {
-  const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
+  useSelector((state: any) => state.accountReducer);
   return (
     <div id="wd-account-navigation" style={{ display: "flex", flexDirection: "column" }}>
       <NavLink
