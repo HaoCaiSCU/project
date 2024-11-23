@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect, useCallback  } from "react";
 import * as coursesClient from "../client";
 import * as modulesClient from "./client";
 
@@ -33,13 +33,14 @@ export default function Modules() {
     dispatch(addModule(module));
   };
 
-  const fetchModules = async () => {
+  const fetchModules = useCallback(async () => {
+    if (!cid) return;
     const modules = await coursesClient.findModulesForCourse(cid as string);
     dispatch(setModules(modules));
-  };
+  }, [cid, dispatch]);
   useEffect(() => {
     fetchModules();
-  }, []);
+  }, [fetchModules]);
 
 
 

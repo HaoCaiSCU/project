@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as client from "./client";
 import { FaPlusCircle, FaTrash } from "react-icons/fa";
 import { TiDelete } from "react-icons/ti";
-import { FaPencil, FaExclamation } from "react-icons/fa6";
+import { FaPencil } from "react-icons/fa6";
 
 export default function WorkingWithArraysAsynchronously() {
     const [todos, setTodos] = useState<any[]>([]);
@@ -45,10 +45,10 @@ export default function WorkingWithArraysAsynchronously() {
         setTodos([...todos, newTodo]);
     };
 
-    const fetchTodos = async () => {
-        const todos = await client.fetchTodos();
-        setTodos(todos);
-    };
+    // const fetchTodos = async () => {
+    //     const todos = await client.fetchTodos();
+    //     setTodos(todos);
+    // };
 
     const removeTodo = async (todo: any) => {
         const updatedTodos = await client.removeTodo(todo);
