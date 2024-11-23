@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AssignmentsControls from "./AssignmentsControls";
 import { BsGripVertical } from "react-icons/bs";
