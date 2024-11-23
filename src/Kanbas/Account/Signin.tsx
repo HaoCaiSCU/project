@@ -1,33 +1,36 @@
-// src/Kanbas/Account/Signin.tsx
+import * as client from "./client";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
-import * as db from "../Database";
+//import * as db from "../Database";
 
 export default function Signin() {
   const [credentials, setCredentials] = useState<any>({});
+  const [error, setError] = useState<string>(""); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const signin = () => {
-    // 查找匹配的用户
-    const user = db.users.find(
-      (u: any) =>
-        u.username === credentials.username &&
-        u.password === credentials.password
-    );
-    // 如果没有匹配用户，忽略登录
-    if (!user) return;
-    
-    // 如果找到用户，设置当前用户并导航到 Dashboard
-    dispatch(setCurrentUser(user));
-    navigate("/Kanbas/Dashboard");
+  const signin = async () => {
+    try {
+      const user = await client.signin(credentials);
+      if (!user) {
+        throw new Error("Invalid username or password");
+      }
+      setError("Wrong username or password");
+      dispatch(setCurrentUser(user));
+      navigate("/Kanbas/Dashboard");
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred");
+    }
   };
 
   return (
     <div id="wd-signin-screen">
       <h1>Sign in</h1>
+      
+      {/* Display error message if present */}
+      {error && <div className="alert alert-danger mb-2">{error}</div>}
       
       <input
         value={credentials.username || ""}

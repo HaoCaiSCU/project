@@ -6,6 +6,7 @@ import { Route, Routes, Navigate } from "react-router";
 import TOC from "./TOC";
 import store from "./store";
 import { Provider } from "react-redux";
+import Lab5 from "./Lab5";
 
 
 export default function Labs() {
@@ -21,6 +22,7 @@ export default function Labs() {
         <Route path="Lab2" element={<Lab2 />} />
         <Route path="Lab3/*" element={<Lab3 />} />
         <Route path="Lab4/*" element={<Lab4 />} />
+        <Route path="Lab5/*" element={<Lab5 />} />
 
       </Routes>
     </div>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "./reducer";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import * as assignmentsClient from "./client";
 
 
 export default function AssignmentEditor() {
@@ -23,16 +24,29 @@ export default function AssignmentEditor() {
         availableUntilDate: "2024-05-15",
     };
 
+    const createAssignment = async (assignment: any) => {
+        const newAssignment = await assignmentsClient.createAssignment(
+          cid as string,
+          assignment
+        );
+        dispatch(addAssignment(newAssignment));
+      };
+    
+      const saveAssignment = async (assignment: any) => {
+        await assignmentsClient.updateAssignment(assignment);
+        dispatch(updateAssignment(assignment));
+      };
+
     const [editedAssignment, setEditedAssignment] = useState(initialAssignment);
 
     const handleSave = async () => {
-        if (isEdit) {
-            await dispatch(updateAssignment(editedAssignment));
-        } else {
-            await dispatch(addAssignment(editedAssignment));
+        if (isEdit) {         
+          await saveAssignment(editedAssignment);        
+        } else { 
+          await createAssignment(editedAssignment);
         }
         navigate(`/Kanbas/Courses/${cid}/Assignments`);
-    };
+      };
 
     const handleCancel = () => {
         navigate(`/Kanbas/Courses/${cid}/Assignments`);

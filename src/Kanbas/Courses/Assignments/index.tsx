@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AssignmentsControls from "./AssignmentsControls";
@@ -7,8 +7,9 @@ import { GiNotebook } from "react-icons/gi";
 import { GoTriangleDown } from "react-icons/go";
 import { BsTrash3Fill } from "react-icons/bs";
 import AssignControlButtons from "./AssignControlButtons";
+import { setAssignment, deleteAssignment } from "./reducer";
+import * as assignmentsClient from "./client";
 import Editing from "./WarningWindow";
-import { deleteAssignment } from "./reducer";
 import './style.css';
 import AssignmentsControlButtons from "./AssignmentsControlButtons";
 
@@ -16,21 +17,30 @@ export default function Assignments() {
   const { cid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const fetchAssignments = async () => {
+    const assignments = await assignmentsClient.findAssignmentsForCourse(cid as string);
+    dispatch(setAssignment(assignments));
+  };
+  const removeAssignment = async (assignmentId: string) => {
+    await assignmentsClient.deleteAssignment(assignmentId);
+    dispatch(deleteAssignment(assignmentId));
+  };
+  
+
   const assignments = useSelector((state: any) => state.assignmentReducer.assignments);
   const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
   const courseAssignments = assignments.filter((assignment: any) => assignment.course === cid);
   const isFaculty = currentUser?.role === "FACULTY";
 
-  const handleRemoveAssignment = (assignmentId: string) => {
-    dispatch(deleteAssignment(assignmentId));
-  };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
   return (
     <div id="wd-assignments">
       {/* Only show the AssignmentsControls component if the user is FACULTY */}
-      {isFaculty && (
-        <AssignmentsControls onAddAssignmentClick={() => navigate(`/Kanbas/Courses/${cid}/Assignments/new`)} />
-      )}
+      {isFaculty && <AssignmentsControls courseId={cid as string} />}
       <br/><br /><br />
       <ul id="wd-assignments-title" className="list-group round-0 w-100">
         <li className="wd-assignment list-group-item p-0 mb-5 fs-5 border-gray">
@@ -74,7 +84,7 @@ export default function Assignments() {
                 {isFaculty && (
                   <Editing
                     assignmentId={assignment._id}
-                    removeAssignment={() => handleRemoveAssignment(assignment._id)}
+                    removeAssignment={() => removeAssignment(assignment._id)}
                   />
                 )}
 

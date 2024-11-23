@@ -1,33 +1,33 @@
 import React from "react";
 import { FaPlus } from "react-icons/fa6";
 import { SlMagnifier } from "react-icons/sl";
-import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { createAssignment } from "./client";
+import { addAssignment } from "./reducer";
 
 type AssignmentsControlsProps = {
-  onAddAssignmentClick?: () => void;
-  cid?: string; 
+  courseId: string;
 };
 
-export default function AssignmentsControls({ onAddAssignmentClick, cid }: AssignmentsControlsProps) {
-  const navigate = useNavigate();
-  const params = useParams();
-  
-  const courseId = cid || params.cid;
+export default function AssignmentsControls({ courseId }: AssignmentsControlsProps) {
+  const dispatch = useDispatch();
 
+  const handleAddAssignment = async () => {
+    const newAssignment = {
+      title: "New Assignment",
+      availableFromDate: new Date().toISOString(),
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7天后
+      points: 100,
+    };
 
-  const handleAddAssignment = () => {
-    if (onAddAssignmentClick) {
-      onAddAssignmentClick();
-    } else if (courseId) {
-      navigate(`/Kanbas/Courses/${courseId}/Assignments/AssignmentEditor`);
-    } else {
-      console.warn("No course ID provided");
-    }
+    const createdAssignment = await createAssignment(courseId, newAssignment);
+
+    dispatch(addAssignment(createdAssignment));
   };
 
   return (
     <div className="d-flex justify-content-between align-items-center">
-      <div className="input-group me-3" style={{ width: '300px' }}>
+      <div className="input-group me-3" style={{ width: "300px" }}>
         <div className="input-group-text bg-white border-end-0">
           <SlMagnifier />
         </div>
@@ -39,13 +39,8 @@ export default function AssignmentsControls({ onAddAssignmentClick, cid }: Assig
       </div>
 
       <div className="d-flex">
-        <button id="wd-add-assignment-group" className="btn btn-outline-secondary me-1">
-          <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
-          Group
-        </button>
-        
-        <button 
-          id="wd-add-assignment" 
+        <button
+          id="wd-add-assignment"
           className="btn btn-danger me-1"
           onClick={handleAddAssignment}
         >

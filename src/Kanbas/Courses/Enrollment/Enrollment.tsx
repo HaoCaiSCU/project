@@ -2,31 +2,43 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import { useEffect, useState } from "react";
+import * as enrollmentsClient from './client';
 
 export default function EnrolledList({ courses }: { courses: any[] }) {
-  //const [] = useState("");
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const [userCourses, setUserCourses] = useState<any[]>([]);
 
   const removeCourse = async (userId: any, courseId: any) => {
     try {
-      
-      
-      const updatedUserCourses = userCourses.filter(
-        (course) => course._id !== courseId
-      );
-      setUserCourses(updatedUserCourses);
-   
+        await enrollmentsClient.unenrollFromCourse(userId, courseId);
+        const updatedUserCourses = userCourses.filter(
+            (course) => course._id !== courseId
+        );
+        setUserCourses(updatedUserCourses);
     } catch (error) {
-      console.error("Error adding course:", error);
+        console.error("Error removing course:", error);
+    }
+};
+useEffect(() => {
+  const fetchEnrollments = async () => {
+    try {
+      const enrollments = await enrollmentsClient.getEnrollmentsForUser(currentUser._id);
+      const courseIds = enrollments.map((enrollment: { course: any; }) => enrollment.course);
+
+      const enrolledCourses = courses.filter((course) =>
+        courseIds.includes(course._id)
+      );
+
+      setUserCourses(enrolledCourses);
+    } catch (error) {
+      console.error("Error fetching user courses:", error);
     }
   };
-  useEffect(() => {
-    const filteredCourses = courses.filter((course) =>
-      currentUser.courses.includes(course._id)
-    );
-    setUserCourses(filteredCourses);
-  }, [currentUser.courses]);
+
+  if (currentUser?._id && courses.length > 0) {
+    fetchEnrollments();
+  }
+}, [currentUser, courses]);
 
   return (
     <div id="wd-dashboard">
