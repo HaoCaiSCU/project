@@ -15,7 +15,7 @@ import AssignmentsControlButtons from "./AssignmentsControlButtons";
 
 export default function Assignments() {
   const { cid } = useParams();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const dispatch = useDispatch();
   const fetchAssignments = useCallback(async () => {
     const assignments = await assignmentsClient.findAssignmentsForCourse(cid as string);
