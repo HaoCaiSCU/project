@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { FaCheck, FaUserCircle } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
@@ -6,42 +6,43 @@ import { useParams, useNavigate } from "react-router";
 import * as client from "../../Account/client";
 
 export default function PeopleDetails() {
-  const { uid } = useParams();
-  const [user, setUser] = useState<any>({});
-  const [editingName, setEditingName] = useState(false);
-  const [editingEmail, setEditingEmail] = useState(false);
-  const [editingRole, setEditingRole] = useState(false);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-
-  const navigate = useNavigate();
-
-  const fetchUser = async () => {
-    if (!uid) return;
-    const user = await client.findUserById(uid);
-    setUser(user);
-    setName(`${user.firstName} ${user.lastName}`);
-    setEmail(user.email);
-    setRole(user.role);
-  };
-
-  const saveUser = async () => {
-    const [firstName, lastName] = name.split(" ");
-    const updatedUser = { ...user, firstName, lastName, email, role };
-    await client.updateUser(updatedUser); // 更新到后端
-    setUser(updatedUser);
-    setEditingName(false);
-    setEditingEmail(false);
-    setEditingRole(false);
-  };
-
-  useEffect(() => {
-    if (uid) fetchUser();
-  }, [uid, fetchUser]);  
-
-  if (!uid) return null;
+    const { uid } = useParams();
+    const [user, setUser] = useState<any>({});
+    const [editingName, setEditingName] = useState(false);
+    const [editingEmail, setEditingEmail] = useState(false);
+    const [editingRole, setEditingRole] = useState(false);
+  
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [role, setRole] = useState("");
+  
+    const navigate = useNavigate();
+  
+    // 用 useCallback 包装 fetchUser
+    const fetchUser = useCallback(async () => {
+      if (!uid) return;
+      const user = await client.findUserById(uid);
+      setUser(user);
+      setName(`${user.firstName} ${user.lastName}`);
+      setEmail(user.email);
+      setRole(user.role);
+    }, [uid, client]); // 确保 uid 和 client 是依赖项
+  
+    useEffect(() => {
+      if (uid) fetchUser();
+    }, [uid, fetchUser]); // fetchUser 是稳定的依赖，消除警告
+  
+    const saveUser = async () => {
+      const [firstName, lastName] = name.split(" ");
+      const updatedUser = { ...user, firstName, lastName, email, role };
+      await client.updateUser(updatedUser); // 更新到后端
+      setUser(updatedUser);
+      setEditingName(false);
+      setEditingEmail(false);
+      setEditingRole(false);
+    };
+  
+    if (!uid) return null;
 
   return (
     <div className="wd-people-details position-fixed top-0 end-0 bottom-0 bg-white p-4 shadow w-25">
