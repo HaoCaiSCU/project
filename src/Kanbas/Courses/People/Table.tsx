@@ -1,5 +1,5 @@
 import { FaUserCircle } from "react-icons/fa";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PeopleDetails from "./Details";
 //import * as db from "../../Database";
 

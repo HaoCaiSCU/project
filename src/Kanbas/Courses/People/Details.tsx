@@ -39,7 +39,7 @@ export default function PeopleDetails() {
 
   useEffect(() => {
     if (uid) fetchUser();
-  }, [uid]);
+  }, [uid, fetchUser]);  
 
   if (!uid) return null;
 
