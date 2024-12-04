@@ -1,47 +1,16 @@
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import "./Navigation.css";
-
 export default function AccountNavigation() {
-  useSelector((state: any) => state.accountReducer);
-  return (
-    <div id="wd-account-navigation" style={{ display: "flex", flexDirection: "column" }}>
-      <NavLink
-        to={`/Kanbas/Account/Signin`}
-        id="wd-signin-link"
-        className="nav-link"
-        style={({ isActive }) => ({
-          color: isActive ? "black" : "red",
-          borderLeft: isActive ? "4px solid black" : "none",
-          paddingLeft: "10px"
-        })}
-      >
-        Signin
-      </NavLink>
-      <NavLink
-        to={`/Kanbas/Account/Signup`}
-        id="wd-signup-link"
-        className="nav-link"
-        style={({ isActive }) => ({
-          color: isActive ? "black" : "red",
-          borderLeft: isActive ? "4px solid black" : "none",
-          paddingLeft: "10px"
-        })}
-      >
-        Signup
-      </NavLink>
-      <NavLink
-        to={`/Kanbas/Account/Profile`}
-        id="wd-profile-link"
-        className="nav-link"
-        style={({ isActive }) => ({
-          color: isActive ? "black" : "red",
-          borderLeft: isActive ? "4px solid black" : "none",
-          paddingLeft: "10px"
-        })}
-      >
-        Profile
-      </NavLink>
-    </div>
-  );
-}
+ const { currentUser } = useSelector((state: any) => state.accountReducer);
+ const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
+ const active = (path: string) => (pathname.includes(path) ? "active" : "");
+ const { pathname } = useLocation();
+ return (
+   <div id="wd-account-navigation" className="list-group">
+     {links.map((link) => (
+       <Link key={link} to={`/Kanbas/Account/${link}`} className={`list-group-item ${active(link)}`}> {link} </Link>
+     ))}
+     {currentUser && currentUser.role === "ADMIN" && (
+       <Link to={`/Kanbas/Account/Users`} className={`list-group-item ${active("Users")}`}> Users </Link> )}
+   </div>
+);}
