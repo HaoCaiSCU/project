@@ -17,15 +17,6 @@ export default function PeopleDetails() {
   const [role, setRole] = useState("");
 
   const navigate = useNavigate();
-
-//   const fetchUser = async () => {
-//     if (!uid) return;
-//     const user = await client.findUserById(uid);
-//     setUser(user);
-//     setName(`${user.firstName} ${user.lastName}`);
-//     setEmail(user.email);
-//     setRole(user.role);
-//   };
   useEffect(() => {
     const fetchUser = async () => {
       if (!uid) return;
@@ -37,7 +28,8 @@ export default function PeopleDetails() {
     };
   
     if (uid) fetchUser();
-  }, [uid, client]);
+  }, [uid]); 
+  
 
 
   const saveUser = async () => {
