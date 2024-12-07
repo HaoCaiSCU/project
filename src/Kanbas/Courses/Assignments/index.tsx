@@ -18,7 +18,7 @@ export default function Assignments() {
   const dispatch = useDispatch();
 
   // 本地状态管理作业列表（只显示简单的名称列表）
-  const [simpleAssignments, setSimpleAssignments] = useState<any[]>([]);
+  const [, setSimpleAssignments] = useState<any[]>([]);
 
   // 从 Redux 状态中获取数据
   const assignments = useSelector((state: any) => state.assignmentReducer.assignments);
