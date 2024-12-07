@@ -25,28 +25,49 @@ export default function AssignmentEditor() {
     };
 
     const createAssignment = async (assignment: any) => {
-        const newAssignment = await assignmentsClient.createAssignment(
-          cid as string,
-          assignment
-        );
-        dispatch(addAssignment(newAssignment));
+        try {
+          const newAssignment = await assignmentsClient.createAssignment(
+            cid as string,
+            assignment
+          );
+          dispatch(addAssignment(newAssignment));
+        } catch (error) {
+          console.error("Failed to create assignment:", error);
+        }
       };
-    
+      
       const saveAssignment = async (assignment: any) => {
-        await assignmentsClient.updateAssignment(assignment);
-        dispatch(updateAssignment(assignment));
+        try {
+          await assignmentsClient.updateAssignment(assignment._id, assignment); 
+          dispatch(updateAssignment(assignment));
+        } catch (error) {
+          console.error("Failed to save assignment:", error);
+        }
       };
+      
+      
 
     const [editedAssignment, setEditedAssignment] = useState(initialAssignment);
 
     const handleSave = async () => {
-        if (isEdit) {         
-          await saveAssignment(editedAssignment);        
-        } else { 
-          await createAssignment(editedAssignment);
+        if (!editedAssignment.title) {
+          console.error("Assignment title is required!");
+          return;
         }
-        navigate(`/Kanbas/Courses/${cid}/Assignments`);
+      
+        try {
+          if (isEdit) {
+            await saveAssignment(editedAssignment); // 更新现有作业
+          } else {
+            await createAssignment(editedAssignment); // 创建新作业
+          }
+          navigate(`/Kanbas/Courses/${cid}/Assignments`);
+        } catch (error) {
+          console.error("Failed to save assignment:", error);
+        }
       };
+      
+      
 
     const handleCancel = () => {
         navigate(`/Kanbas/Courses/${cid}/Assignments`);
