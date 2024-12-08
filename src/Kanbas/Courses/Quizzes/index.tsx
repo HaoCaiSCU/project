@@ -17,9 +17,9 @@ import * as client from "./client";
 
 export default function Quizzes() {
   const { cid } = useParams();
-  const [error, setError] = useState("");
+  const [, setError] = useState("");
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
-  const [quiz, setQuiz] = useState({ points: 0, course: cid });
+  const [quiz] = useState({ points: 0, course: cid });
   const dispatch = useDispatch();
   const currentDate = new Date();
   const { currentUser } = useSelector((state: any) => state.accountReducer);

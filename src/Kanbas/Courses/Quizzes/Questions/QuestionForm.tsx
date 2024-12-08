@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import QuizTextEditor from "../QuizTextEditor";
 import "./QuestionForm.css";
 

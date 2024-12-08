@@ -12,7 +12,6 @@ export default function QuizDetails() {
   
   // 用户信息
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const userId = currentUser._id;
   const role = currentUser.role;
 
   const quiz = quizzes.find((quiz: any) => quiz._id === qid);
