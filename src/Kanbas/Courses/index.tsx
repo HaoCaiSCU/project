@@ -7,7 +7,11 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa6";
 import PeopleTable from "./People/Table";
 import ProtectedRoute from "../Account/ProtectedRoute";
-//import { courses } from "../Database";
+import Quizzes from "./Quizzes";
+import QuizDetails from "./Quizzes/QuizDetails";
+import QuizEditor from "./Quizzes/QuizEditor";
+import QuizPreview from "./Quizzes/QuizTake/QuizPreview";
+
 
 export default function Courses({ courses }: { courses: any[]; }) {
   const { cid } = useParams();
@@ -26,12 +30,16 @@ export default function Courses({ courses }: { courses: any[]; }) {
         </div>
         <div className="flex-fill">
           <Routes>
-          <Route path="/" element={<Navigate to="Home" />} />
-                <Route path="Home" element={<Home />} />
-                <Route path="Modules" element={<ProtectedRoute><Modules /></ProtectedRoute>} />
-                <Route path="Assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
-                <Route path="Assignments/:aid" element={<AssignmentEditor />} />
-                <Route path="People" element={<PeopleTable />} />
+            <Route path="/" element={<Navigate to="Home" />} />
+            <Route path="Home" element={<Home />} />
+            <Route path="Modules" element={<ProtectedRoute><Modules /></ProtectedRoute>} />
+            <Route path="Assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
+            <Route path="Assignments/:aid" element={<AssignmentEditor />} />
+            <Route path="People" element={<PeopleTable />} />
+            <Route path="Quizzes" element={<Quizzes />} />
+            <Route path="Quizzes/:qid/Details" element={<QuizDetails />} />
+            <Route path="Quizzes/:qid/Editor" element={<QuizEditor />} />
+            <Route path="Quizzes/:qid/Preview" element={<QuizPreview />} />
           </Routes>
         </div></div>
 
