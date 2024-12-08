@@ -1,0 +1,40 @@
+#wd-profile-screen,
+#wd-signup-screen,
+#wd-signin-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#wd-profile-screen h3,
+#wd-signup-screen h3,
+#wd-signin-screen h3 {
+    margin-bottom: 20px;
+}
+
+#wd-signup-screen .form-control,
+#wd-signin-screen .form-control {
+    margin-bottom: 10px;
+}
+
+#wd-signup-btn,
+#wd-signin-btn {
+    margin-top: 10px;
+}
+
+#wd-signup-screen .d-block,
+#wd-signin-screen .d-block {
+    margin-top: 15px;
+    text-align: left;
+}
+
+
+#wd-profile-screen .form-control,
+#wd-signup-screen .form-control,
+#wd-signin-screen .form-control {
+    margin-bottom: 10px;
+}

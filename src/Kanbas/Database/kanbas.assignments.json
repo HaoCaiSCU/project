@@ -1,0 +1,63 @@
+[{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb1e"
+  },
+  "title": "Propulsion Assignment",
+  "course": "RS101"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb1f"
+  },
+  "title": "Combustion Analysis",
+  "course": "RS101"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb20"
+  },
+  "title": "Nozzle Design Project",
+  "course": "RS101"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb21"
+  },
+  "title": "Aerodynamics Quiz",
+  "course": "RS102"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb22"
+  },
+  "title": "Flow Analysis",
+  "course": "RS102"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb23"
+  },
+  "title": "Heating Analysis",
+  "course": "RS102"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb24"
+  },
+  "title": "Structural Design Task",
+  "course": "RS103"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb25"
+  },
+  "title": "Orbital Calculations",
+  "course": "RS103"
+},
+{
+  "_id": {
+    "$oid": "6752ab8518297458479ccb26"
+  },
+  "title": "Systems Engineering Exam",
+  "course": "RS103"
+}]

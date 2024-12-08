@@ -1,0 +1,22 @@
+.green-icon {
+    color: green;
+}
+
+.red-icon {
+    color: rgba(182, 23, 23, 0.801);
+}
+
+.title-background {
+    background-color: #f1f2f3;
+}
+
+.wd-assignment-link {
+    color: black;
+    text-decoration: none;
+}
+
+
+.assignment-item {
+    border-left: 5px solid green;
+    padding-left: 10px;
+}
