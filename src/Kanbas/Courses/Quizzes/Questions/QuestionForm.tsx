@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import QuizTextEditor from "../QuizTextEditor";
 import "./QuestionForm.css";
 
@@ -11,7 +11,6 @@ const QuestionForm = ({ question, onCancel, onSave }: { question: any, onCancel:
   const [possibleAnswers, setPossibleAnswers] = useState(question ? question.possible_answers || [] : []);
   const [choices, setChoices] = useState(question ? question.choices || [] : []);
   const [isTrue, setIsTrue] = useState(question ? question.is_true || false : false);
-  const totalPoints = useSelector((state: any) => state.questionsReducer.totalPoints);
 
   useEffect(() => {
     if (question) {

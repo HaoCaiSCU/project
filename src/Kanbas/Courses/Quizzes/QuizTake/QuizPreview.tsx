@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import * as QuestionClient from '../Questions/clients';
 import * as QuizClient from '../client';
 import * as client from './client';
@@ -11,7 +11,7 @@ const QuizPreview = () => {
   const { cid } = useParams() as any;
   const { qid } = useParams() as any;
 
-  const [quiz, setQuiz] = useState<any>(null);
+  const [, setQuiz] = useState<any>(null);
   const [quizInstructions, setQuizInstructions] = useState<any>('');
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<any>({});
@@ -149,13 +149,6 @@ const QuizPreview = () => {
       setScore(score);
 
       // 组装一个attempt
-      const attempt = {
-        quiz_id: qid,
-        user_id: userId,
-        created_at: new Date(),
-        answers: attemptAnswers,
-        score: score
-      };
 
 
       // 更新attemptsNumber

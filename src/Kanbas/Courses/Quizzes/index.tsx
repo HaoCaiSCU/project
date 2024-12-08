@@ -2,14 +2,13 @@ import { BsGripVertical } from "react-icons/bs";
 import { IoMdMore } from "react-icons/io";
 import { FaRocket } from "react-icons/fa";
 import GreenCheckmark from "./GreenCheckmark";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { IoBan } from "react-icons/io5";
 import { FaCaretDown } from "react-icons/fa";
 import {
   setQuizzes,
   addQuiz,
-  editQuiz,
   updateQuiz,
   deleteQuiz,
 } from "./reducer";
