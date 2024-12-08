@@ -24,41 +24,6 @@ const QuizPreview = () => {
   const userId = currentUser._id;
   const role = currentUser.role;
 
-  // 获取该quiz的信息
-  const fetchQuiz = async () => {
-    try {
-      const quiz = await QuizClient.findQuiz(cid as string, qid as string);
-      setQuiz(quiz);
-      setQuizInstructions(quiz.quiz_instructions);
-      console.log(quiz);
-      console.log(quiz.quiz_instructions);
-
-      // 如果是学生，设置attemptsNumber
-      console.log("current user role:", role);
-      if (role === 'STUDENT') {
-        const count = await client.getPreviousAttemptsNumber(qid, userId);
-        setAttemptsNumber(quiz.how_many_attempts - count);
-        console.log("how_many_attempts:", quiz.how_many_attempts,
-          "count:", count,
-          "attemptsNumber:", attemptsNumber);
-      }
-    } catch (err) {
-      console.error("Failed to fetch quiz: ", err);
-    }
-  }
-
-  // 获取该quiz的所有questions
-  const fetchQuestions = async () => {
-    try {
-      const questions = await QuestionClient.findQuestionsByQuizId(qid as string);
-      setQuestions(questions);
-      console.log(questions);
-    } catch (err) {
-      console.error("Failed to fetch questions: ", err);
-    }
-  };
-
-  // 获取latestAttempt
   const fetchLatestAttempt = async () => {
     try {
       const latestAttempt = await client.getLatestAttempt(qid, userId);
@@ -87,10 +52,55 @@ const QuizPreview = () => {
 
   // 渲染
   useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const quiz = await QuizClient.findQuiz(cid as string, qid as string);
+        setQuiz(quiz);
+        setQuizInstructions(quiz.quiz_instructions);
+        if (role === 'STUDENT') {
+          const count = await client.getPreviousAttemptsNumber(qid, userId);
+          setAttemptsNumber(quiz.how_many_attempts - count);
+        }
+      } catch (err) {
+        console.error("Failed to fetch quiz: ", err);
+      }
+    };
+  
+    const fetchQuestions = async () => {
+      try {
+        const questions = await QuestionClient.findQuestionsByQuizId(qid as string);
+        setQuestions(questions);
+      } catch (err) {
+        console.error("Failed to fetch questions: ", err);
+      }
+    };
+  
+    const fetchLatestAttempt = async () => {
+      try {
+        const latestAttempt = await client.getLatestAttempt(qid, userId);
+        if (!latestAttempt) return;
+  
+        setLatestAttempt(latestAttempt);
+  
+        const newAnswers: any = {};
+        latestAttempt.answers.forEach((answer: any) => {
+          newAnswers[answer.question_id] = {
+            choice: answer.choice || null,
+            is_true: answer.is_true !== undefined ? answer.is_true : null,
+            blanks: answer.blanks || [],
+          };
+        });
+        setAnswers(newAnswers);
+      } catch (err) {
+        console.error("Failed to fetch latest attempts: ", err);
+      }
+    };
+  
     fetchQuiz();
     fetchQuestions();
     fetchLatestAttempt();
-  }, [qid]);
+  }, [qid, cid, role, userId]);
+  
 
   // true false question
   const handleTrueFalseAnswerChange = (questionId: string, is_true: Boolean) => {

@@ -16,18 +16,20 @@ export default function QuestionsEditor() {
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<any>(null);
 
-  const fetchQuestions = async () => {
-    try {
-      const questions = await client.findQuestionsByQuizId(qid as string);
-      dispatch(setQuestions(questions));
-    } catch (err) {
-      console.error("Failed to fetch questions: ", err);
-    }
-  };
 
   useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const fetchedQuestions = await client.findQuestionsByQuizId(qid as string);
+        dispatch(setQuestions(fetchedQuestions));
+      } catch (err) {
+        console.error("Failed to fetch questions: ", err);
+      }
+    };
+  
     fetchQuestions();
-  }, [qid]);
+  }, [qid, dispatch]);
+  
 
   const handleDelete = (questionId: string) => {
     const question = questions.find((q: any) => q._id === questionId);

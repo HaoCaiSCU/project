@@ -24,14 +24,6 @@ export default function Quizzes() {
   const currentDate = new Date();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const role = currentUser.role;
-  const fetchQuizzes = async () => {
-    try {
-      const quizzes = await client.findQuizzesForCourse(cid as string);
-      dispatch(setQuizzes(quizzes));
-    } catch (err) {
-      setError("Error fetching quizzes");
-    }
-  };
 
   const createQuiz = async (quiz: any) => {
     try {
@@ -70,8 +62,18 @@ export default function Quizzes() {
     }
   };
   useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const quizzes = await client.findQuizzesForCourse(cid as string);
+        dispatch(setQuizzes(quizzes));
+      } catch (err) {
+        setError("Error fetching quizzes");
+      }
+    };
+  
     fetchQuizzes();
-  }, [quizzes]);
+  }, [cid, dispatch]);
+  
 
   return (
     <div id="wd-quizzes">

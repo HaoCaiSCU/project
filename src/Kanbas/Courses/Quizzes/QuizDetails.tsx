@@ -16,19 +16,20 @@ export default function QuizDetails() {
 
   const quiz = quizzes.find((quiz: any) => quiz._id === qid);
   const dispatch = useDispatch();
-  const fetchQuizzes = async () => {
-    try {
-      const quizzes = await client.findQuizzesForCourse(cid as string);
-      dispatch(setQuizzes(quizzes));
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
-  
   useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const quizzes = await client.findQuizzesForCourse(cid as string);
+        dispatch(setQuizzes(quizzes));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  
     fetchQuizzes();
-  }, []);
+  }, [cid, dispatch]);
+  
 
   return (
     <div>
