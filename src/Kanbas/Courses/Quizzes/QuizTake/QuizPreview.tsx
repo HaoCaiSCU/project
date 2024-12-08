@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import * as QuestionClient from '../Questions/clients';
 import * as QuizClient from '../client';
@@ -10,7 +10,6 @@ import RenderHtmlString from './RenderHtmlString';
 const QuizPreview = () => {
   const { cid } = useParams() as any;
   const { qid } = useParams() as any;
-  const navigate = useNavigate();
 
   const [quiz, setQuiz] = useState<any>(null);
   const [quizInstructions, setQuizInstructions] = useState<any>('');
@@ -158,7 +157,6 @@ const QuizPreview = () => {
         score: score
       };
 
-      const response = await client.postAttempt(attempt);
 
       // 更新attemptsNumber
       setAttemptsNumber(attemptsNumber - 1);

@@ -3,7 +3,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import * as client from "./client";
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { setQuizzes } from "./reducer";
 export default function QuizDetails() {
   const { qid } = useParams();

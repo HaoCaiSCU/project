@@ -1,16 +1,13 @@
 import QuestionForm from "./QuestionForm";
-import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as client from "./clients";
 import { updateQuizPoints } from "../client";
 import { setQuestions, addQuestion, deleteQuestion, updateQuestion } from "./reducer";
 
 export default function QuestionsEditor() {
-  const { cid } = useParams();
   const { qid } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const questions = useSelector((state: any) => state.questionsReducer.questions);
   const totalPoints = useSelector((state: any) => state.questionsReducer.totalPoints);
