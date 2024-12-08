@@ -209,7 +209,7 @@ export default function Quizzes() {
                       </a>
                     </li>
                     <li>
-                      <a
+                      <button
                         id="wd-delete-quiz-btn"
                         className="dropdown-item"
                         // href="#"
@@ -219,10 +219,10 @@ export default function Quizzes() {
                         }}
                       >
                         Delete
-                      </a>
+                      </button>
                     </li>
                     <li>
-                      <a
+                      <button
                         id="wd-publish-quiz-btn"
                         className="dropdown-item"
                         //href="#"
@@ -232,7 +232,7 @@ export default function Quizzes() {
                         }}
                       >
                         {quiz.status ? "Unpublish" : "Publish"}
-                      </a>
+                      </button>
                     </li>
                   </ul>
                 </div>

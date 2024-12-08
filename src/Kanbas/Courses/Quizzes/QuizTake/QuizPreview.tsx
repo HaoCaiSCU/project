@@ -241,12 +241,10 @@ const handleRetake = () => {
         <button className="btn btn-primary">Edit Quiz</button>
         )}
       </Link> 
-        <a>   </a>
       <Link to = {`/Kanbas/Courses/${cid}/Quizzes`}>
         <button className="btn btn-secondary me-2">Back to Quizzes</button>
       </Link>
         <button className="btn btn-danger" onClick={handleSubmit}>Submit Quiz</button>
-        <a>   </a>
         <button className="btn btn-danger" onClick={handleRetake}>Retake Quiz</button>
         <hr /><div>
           <p> <strong>Attempts Left: </strong>{role !== 'FACULTY' ? attemptsNumber : 'Infinite'} </p>
