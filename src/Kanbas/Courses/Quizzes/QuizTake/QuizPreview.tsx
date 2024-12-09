@@ -25,44 +25,19 @@ const QuizPreview = () => {
     const userId = currentUser._id;
     const role = currentUser.role;
 
-    useEffect(() => {
-        const initialAnswers: any = {};
-        questions.forEach((question) => {
-            if (question.type === 'fill_in_blanks') {
-                initialAnswers[question._id] = {
-                    blanks: Array(question.possible_answers?.length || 0).fill(''),
-                };
-            }
-        });
-        setAnswers(initialAnswers);
-    }, [questions]);
-
-
     const fetchLatestAttempt = async () => {
         try {
-            const latestAttempt = await client.getLatestAttempt(qid, userId);
-            if (!latestAttempt) {
-                return;
-            }
+            const response = await fetch(`/api/quizzes/${qid}/attempts/latest?user_id=${userId}`);
+            const latestAttempt = await response.json();
+
+            if (!response.ok) throw new Error(latestAttempt.error);
 
             setLatestAttempt(latestAttempt);
-            console.log(latestAttempt);
-
-            // 更新answers状态
-            const newAnswers: any = {};
-            latestAttempt.answers.forEach((answer: any) => {
-                newAnswers[answer.question_id] = {
-                    choice: answer.choice || null,
-                    is_true: answer.is_true !== undefined ? answer.is_true : null,
-                    blanks: answer.blanks || []
-                };
-            });
-            setAnswers(newAnswers);
-
         } catch (err) {
-            console.error("Failed to fetch latest attempts: ", err);
+            console.error("Failed to fetch latest attempt:", err);
         }
     };
+
 
     // 渲染
     useEffect(() => {
@@ -145,7 +120,7 @@ const QuizPreview = () => {
             is_true: null,
             blanks: updatedBlanks
         };
-        console.log(updatedBlanks);
+        //console.log(updatedBlanks);
         setAnswers({ ...answers, [questionId]: answer });
     };
 
@@ -159,6 +134,7 @@ const QuizPreview = () => {
         }
 
         try {
+
             // 将answers转换成数组
             const attemptAnswers = Object.keys(answers).map(questionId => ({
                 question_id: questionId,
@@ -170,6 +146,9 @@ const QuizPreview = () => {
             // 计算分数
             const score = countScore(attemptAnswers);
             setScore(score);
+
+            // 组装一个attempt
+
 
             // 更新attemptsNumber
             setAttemptsNumber(attemptsNumber - 1);
@@ -224,8 +203,39 @@ const QuizPreview = () => {
         return parseFloat(score.toFixed(2));
     }
 
+    const isAnswerCorrect = (question: any, answer: any) => {
+        switch (question.type) {
+            case "multiple_choice":
+                const correct_choice = question.choices.find((choice: any) => choice.correct);
+                return correct_choice && correct_choice.answer === answer.choice;
+            case "true_false":
+                return question.is_true === answer.is_true;
+                break;
+            case "fill_in_blanks":
+                return Array.isArray(answer.blanks) && question.possible_answers.every((possible_answer: any, index: any) => possible_answer === answer.blanks[index]);
+            default:
+                return false;
+        }
+    }
+
 // zys: handle 'Next'buton
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+    /*const handleNextQuestion = () => {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    };*/
+
+
+    /*const handleRetake = () => {
+      setAnswers({});
+      setScore(null);
+    }*/
+    const handleAnswerChange = (questionId: string, selectedAnswer: string | boolean) => {
+        setAnswers((prevAnswers: any) => ({
+            ...prevAnswers,
+            [questionId]: selectedAnswer,
+        }));
+    };
 
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
@@ -244,10 +254,11 @@ const QuizPreview = () => {
             console.error("No questions available to submit.");
             return;
         }
-
+        let totalPoints = 0; // Total possible points
         let calculatedScore = 0;
 
         questions.forEach((question) => {
+            totalPoints += question.points;
             const userAnswer = answers[question._id];
 
             if (question.type === "multiple_choice") {
@@ -280,19 +291,57 @@ const QuizPreview = () => {
             setAttemptsNumber((prev) => Math.max(0, prev - 1));
         }
     }
+    /*// Optionally: Send score or attempt data to the server
+    try {
+      const attemptData = {
+        user_id: userId,
+        quiz_id: qid,
+        answers: Object.keys(answers).map((questionId) => ({
+          question_id: questionId,
+          ...answers[questionId],
+        })),
+        score: calculatedScore,
+      };
+      await client.submitAttempt(attemptData); // Assume `submitAttempt` sends the data to the backend
+      console.log("Attempt submitted successfully!");
+    } catch (err) {
+      console.error("Failed to submit attempt:", err);
+    }
+  };*/
 
+    const attempts = [
+        {
+            attemptNumber: 1,
+            time: "15 minutes",
+            score: "20 out of 20",
+            isLatest: true,
+            submittedAt: "Nov 6 at 12:28am",
+            duration: "15 minutes",
+        },
+    ];
+
+    const handleRetake = () => {
+        setAnswers({});
+        setScore(null);
+    }
     return (
+
         <div style={{ display: 'flex' }}>
             {/* Left Section: Quiz Preview */}
             <div style={{ flex: 2, padding: '20px', overflowY: 'auto', borderRight: '1px solid #ccc' }}>
                 <h1>{quiz?.title}</h1>
                 <p><strong>Started:</strong> {new Date().toLocaleString()}</p>
                 <p className="warning-message">⚠️ This is a preview of the published version of the quiz</p>
+
                 <hr />
+
                 <h2>Quiz Instructions</h2>
                 <RenderHtmlString htmlString={quizInstructions} />
+
                 <hr />
+
                 <div>
+
                     <section className="quiz-questions">
                         {questions.length > 0 && (
                             <div className="question-container">
@@ -300,24 +349,30 @@ const QuizPreview = () => {
                                     <p className="question-number">Question {currentQuestionIndex + 1}</p>
                                     <p className="question-points">{questions[currentQuestionIndex].points} pts</p>
                                 </div>
-                                <RenderHtmlString htmlString={questions[currentQuestionIndex].question} />
+                                <RenderHtmlString htmlString={questions[currentQuestionIndex].question}/>
 
                                 {/* Answer Options */}
                                 {/* Multiple Choice*/}
                                 <div className="answer-options">
                                     {questions[currentQuestionIndex].type === 'multiple_choice' &&
-                                        questions[currentQuestionIndex].choices.map((choice: any) => (
-                                            <div key={choice._id} className="answer-option">
+                                        questions[currentQuestionIndex].choices.map((choice: any, index: number) => (
+                                            <div key={choice._id} className="choice-container">
+                                                {index > 0 &&
+                                                    <hr className="option-separator"/>} {/* Horizontal line */}
                                                 <input
                                                     type="radio"
                                                     name={`question-${currentQuestionIndex}`}
                                                     value={choice.answer}
                                                     checked={answers[questions[currentQuestionIndex]._id]?.choice === choice.answer}
                                                     onChange={() => handleMultipleChoiceAnswerChange(questions[currentQuestionIndex]._id, choice.answer)}
+
                                                 />
-                                                {choice.answer}
+                                                <span className="choice-text">{choice.answer}</span>
+
                                             </div>
                                         ))}
+
+
                                     {/* True/False */}
                                     {questions[currentQuestionIndex].type === 'true_false' && (
                                         <div className="true-false-options">
@@ -331,7 +386,7 @@ const QuizPreview = () => {
                                                 />
                                                 True
                                             </label>
-                                            <hr />
+                                            <hr/>
                                             <label>
                                                 <input
                                                     type="radio"
@@ -346,19 +401,28 @@ const QuizPreview = () => {
                                     )}
 
                                     {/* Fill-in-the-Blanks */}
-                                    {questions[currentQuestionIndex].type === 'fill_in_blanks' &&
-                                        questions[currentQuestionIndex].possible_answers.map((blank: any, index: number) => (
-                                            <div key={index} className="answer-option">
-                                                <label>
-                                                    Your answers:
+                                    {questions[currentQuestionIndex].type === "fill_in_blanks" &&
+                                        questions[currentQuestionIndex].possible_answers.map(
+                                            (blank: any, index: number) => (
+                                                <div key={index} className="answer-option">
                                                     <input
                                                         type="text"
-                                                        value={answers[questions[currentQuestionIndex]._id]?.blanks?.[index] || ''}
-                                                        onChange={(e) => handleBlanksAnswerChange(questions[currentQuestionIndex]._id, index, e.target.value)}
+                                                        id={`blank-${index}`}
+                                                        value={
+                                                            answers[questions[currentQuestionIndex]._id]?.blanks?.[index] || ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleBlanksAnswerChange(questions[currentQuestionIndex]._id, index, e.target.value)}
+                                                        style={{
+                                                            padding: "5px",
+                                                            border: "1px solid #ccc",
+                                                            borderRadius: "4px",
+                                                            width: "100%",
+                                                            maxWidth: "300px",
+                                                        }}
                                                     />
-                                                </label>
-                                            </div>
-                                        ))}
+                                                </div>
+                                            ))}
                                 </div>
                             </div>
                         )}
@@ -380,15 +444,9 @@ const QuizPreview = () => {
                         >
                             Next
                         </button>
-                        <button
-                            onClick={handleSubmitQuiz}
-                            className="btn btn-primary navigation-btn"
-                        >
-                            Submit Quiz
-                        </button>
-                        <Link to={`/Kanbas/Courses/${cid}/Quizzes`}>
-                            <button className="btn btn-secondary navigation-btn">Back to Quizzes</button>
-                        </Link>
+                        <button className="btn btn-danger" onClick={handleSubmit}>Submit Quiz</button>
+                        <button className="btn btn-danger" onClick={handleRetake}>Retake Quiz</button>
+
                     </div>
 
                     {/* Footer */}
@@ -400,125 +458,48 @@ const QuizPreview = () => {
                             Keep Editing This Quiz
                         </Link>
                     </div>
-
-
                 </div>
                 <hr/>
             </div>
 
+            {/* Score Display */}
+
             {/* Right Section: Popup or Next Section */}
-            <div style={{flex: 1, padding: '20px', overflowY: 'auto', backgroundColor: '#f9f9f9' }}>
-                <h3>Next Person’s Popup</h3>
-                {/* Add content or a modal here */}
-                <div>
-                    <p>This is where you can place additional content, like a modal or instructions for the next person.</p>
-                </div>
+            <div style={{flex: 1, padding: "20px", overflowY: "auto", backgroundColor: "#f9f9f9" }}>
+                <h3>Attempt History</h3>
+                <table className="attempt-history-table">
+                    <thead>
+                    <tr>
+                        <th>Attempt</th>
+                        <th>Time</th>
+                        <th>Score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {attempts.map((attempt, index) => (
+                        <tr key={index}>
+                            <td>{`Attempt ${attempt.attemptNumber}`}</td>
+
+                            <td>{attempt.time}</td>
+                            <td>{score} / 100</td> {/* Use normalized score */}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+                <hr />
+                {attempts[0] && (
+                    <div>
+
+                        <p>
+                            <strong>Submitted:</strong> {attempts[0].submittedAt}
+                        </p>
+
+                    </div>
+                )}
+                {score !== null && <p>Your Score: {score}</p>}
             </div>
         </div>
     );
-}
-
-
-
-
-/*<div className="quiz-form" style={{ flex: 1 }}>
-  <Link to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/Editor`}>
-    {role === 'FACULTY' && (
-    <button className="btn btn-primary">Edit Quiz</button>
-    )}
-  </Link>
-  <Link to = {`/Kanbas/Courses/${cid}/Quizzes`}>
-    <button className="btn btn-secondary me-2">Back to Quizzes</button>
-  </Link>
-    <button className="btn btn-danger" onClick={handleSubmit}>Submit Quiz</button>
-    <button className="btn btn-danger" onClick={handleRetake}>Retake Quiz</button>
-    <hr /><div>
-      <p> <strong>Attempts Left: </strong>{role !== 'FACULTY' ? attemptsNumber : 'Infinite'} </p>
-      <p> <strong>Your score:</strong>{score !== null && <p> {score}</p>} </p>
-      <p> <strong>Quiz Instructions:</strong> <RenderHtmlString htmlString={quizInstructions} /></p>
-    </div><hr />
-  <div>
-    {questions.map((question) => (
-      <div key={question._id}>
-        <p><strong>Question: </strong> <RenderHtmlString htmlString={question.question} /></p>
-        <p><strong>Points: </strong>{question.points}</p>
-        <p><strong>Answer:</strong></p>
-        {question.type === 'multiple_choice' && question.choices.map((choice: any) => (
-          <div key={choice._id}>
-            <input
-              type="radio"
-              name={question._id}
-                value={choice.answer}
-                checked={answers[question._id]?.choice === choice.answer}
-                onChange={() => handleMultipleChoiceAnswerChange(question._id, choice.answer)}
-              />
-              {choice.answer}
-              </div>
-          ))}
-          {question.type === 'true_false' && (
-            <div>
-              <input
-                type="radio"
-                name={question._id}
-                value="true"
-                checked={answers[question._id]?.is_true === true}
-                onChange={() => handleTrueFalseAnswerChange(question._id, true)}
-              />
-              True
-              <input
-                type="radio"
-                name={question._id}
-                value="false"
-                checked={answers[question._id]?.is_true === false}
-                onChange={() => handleTrueFalseAnswerChange(question._id, false)}
-              />
-              False
-            </div>
-          )}
-          {question.type === 'fill_in_blanks' && question.possible_answers.map((blank: any, index: number) => (
-            <div>
-            <input
-              key={index}
-              type="text"
-              value={answers[question._id]?.blanks?.[index] || ''}
-              onChange={(e) => handleBlanksAnswerChange(question._id, index, e.target.value)}
-            />
-            <br />
-            </div>
-          ))}
-        <hr /></div>
-      ))}
-    </div>
-  </div>
-  <div className="quiz-form" style={{ flex: 1, marginLeft: '20px' }}>
-    <h3>Latest Attempt</h3>
-    {latestAttempt && (
-    <div>
-    <p><strong>Take Time:</strong> {new Date(latestAttempt.created_at).toLocaleString()}</p>
-    <p><strong>Get Score:</strong> {latestAttempt.score}</p>
-    <h4>Answered:</h4>
-    <ul>
-      {latestAttempt.answers.map((answer: any) => {
-        const question = questions.find(q => q._id === answer.question_id);
-        if (!question) {
-          throw new Error(`Question not found: ${answer.question_id}`);
-        }
-        const correct = isAnswerCorrect(question, answer);
-        return (
-          <li className="answered-question" key={answer.question_id} style={{ color: correct ? 'green' : 'red' }}>
-            <p><strong>Question:</strong> {question?.question}</p>
-            <p><strong>Answer:</strong> {answer.choice || (answer.is_true !== null ? answer.is_true.toString() : answer.blanks.join(', '))}</p>
-            {correct ? <p>✔️ Correct</p> : <p>❌ Incorrect</p>}
-          </li>
-        );
-      })}
-    </ul>
-    </div>
-    )}
-  </div>
-
-  </div>
-    );
-  };*/
+};
 
 export default QuizPreview;

@@ -8,7 +8,7 @@
 /* Left Section: Quiz Preview */
 .quiz-form {
     flex: 2;
-    padding: 20px 20px 40px;
+    padding: 20px;
     border-right: 1px solid #ccc;
     overflow-y: auto;
     background-color: #ffffff;
@@ -120,15 +120,6 @@ input[type="text"] {
 
 input[type="text"] {
     width: calc(100% - 12px);
-    min-width: 200px;
-    height: 36px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 10;
 }
 
 input:focus {
@@ -173,12 +164,9 @@ input:focus {
 }
 
 .answer-options .answer-option {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* 保证输入框在左侧对齐 */
-    width: 100%; /* 确保输入框占满可用空间 */
-    padding: 10px 0;
-    min-height: 40px;
+    margin: 10px 0;
+    padding: 5px 0;
+    border-top: 1px solid #ddd;
 }
 
 .answer-options .answer-option:first-child {
@@ -253,4 +241,130 @@ input:focus {
 .footer-btn:hover {
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* General Styling */
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Attempt History Table */
+.attempt-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.attempt-history-table th,
+.attempt-history-table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.attempt-history-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.attempt-history-table td {
+    background-color: #fff;
+}
+
+.attempt-history-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Footer Button Styling */
+.footer {
+    margin-top: 20px;
+}
+
+.footer-btn {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #555;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.footer-btn:hover {
+    background-color: #f2f2f2;
+    border-color: #bbb;
+}
+
+.answer-option {
+    margin-bottom: 10px;
+}
+
+.answer-option input {
+    width: 100%;
+    max-width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.multiple-choice-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.multiple-choice-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.multiple-choice-label {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+.multiple-choice-option:hover .multiple-choice-label {
+    background-color: #f1f1f1;
+}
+.choice-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+
+.choice-container span {
+    word-wrap: break-word; /* Ensures long text wraps nicely */
+}
+
+.choice-container input[type="radio"] {
+    margin-right: 8px; /* Reduce space between button and text */
+}
+
+.choice-container .choice-text {
+    word-wrap: break-word; /* Ensure text wraps properly */
+}
+
+.option-separator {
+    border: none;
+    border-top: 1px solid #ddd; /* Horizontal line for separation */
+    margin: 5px 0; /* Add spacing around the line */
 }
