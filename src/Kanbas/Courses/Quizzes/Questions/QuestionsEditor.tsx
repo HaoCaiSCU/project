@@ -29,15 +29,20 @@ export default function QuestionsEditor() {
   
     fetchQuestions();
   }, [qid, dispatch]);
-  
 
   const handleDelete = (questionId: string) => {
     const question = questions.find((q: any) => q._id === questionId);
-    if (question._id) {
-      dispatch(deleteQuestion(question._id)); // 更新全局状态
-      setDeletedQuestions([...deletedQuestions, question]); // 保存已删除的问题
+
+    if (question?._id) {
+      // 如果问题已存在于数据库，移除它并加入 `deletedQuestions`
+      dispatch(deleteQuestion(questionId));
+      setDeletedQuestions((prev) => [...prev, question]);
+    } else {
+      // 如果问题是新添加的，仅从 Redux 状态中移除
+      dispatch(deleteQuestion(questionId));
     }
   };
+
 
   const handleNewQuestionClick = () => {
     setIsAddingQuestion(true);
@@ -50,11 +55,17 @@ export default function QuestionsEditor() {
   };
 
   const handleSave = (question: any) => {
+    const updatedQuestion = {
+      ...question,
+      _id: question._id || `temp-${Date.now()}`, // 如果没有 _id，则生成一个临时 ID
+    };
+
     if (editingQuestion) {
-      dispatch(updateQuestion(question)); // 更新全局状态
+      dispatch(updateQuestion(updatedQuestion)); // 更新 Redux 状态
     } else {
-      dispatch(addQuestion(question)); // 更新全局状态
+      dispatch(addQuestion(updatedQuestion)); // 添加到 Redux 状态
     }
+
     setIsAddingQuestion(false);
     setEditingQuestion(null);
   };
@@ -66,23 +77,46 @@ export default function QuestionsEditor() {
 
   const handleSaveAll = async () => {
     try {
-      // 保存全局状态的所有问题到数据库，对于已删除的问题同步删除
-      await Promise.all(questions.map((question:any) => {
-        if (question._id) {
-          return client.updateQuestion(question._id, question);
-        } else {
-          return client.createQuestion(qid as string, question);
+      // 保存新增和更新的问题
+      await Promise.all(
+          questions.map((question: any) => {
+            if (question._id) {
+              // 如果问题已有 `_id`，调用更新接口
+              return client.updateQuestion(question._id, question);
+            } else {
+              // 如果问题是新添加的，调用创建接口
+              return client.createQuestion(qid as string, question);
+            }
+          })
+      );
+
+      // 删除标记为删除的问题
+      const deleteResults = await Promise.allSettled(
+          deletedQuestions.map((question: any) =>
+              client.deleteQuestion(question._id)
+          )
+      );
+
+      // 记录删除失败的条目
+      deleteResults.forEach((result, index) => {
+        if (result.status === "rejected") {
+          console.error(
+              `Failed to delete question: ${deletedQuestions[index]._id}`,
+              result.reason
+          );
         }
-      })); 
-      await Promise.all(deletedQuestions.map((question: any) => {
-        return client.deleteQuestion(question._id);
-      }));
-      await updateQuizPoints(qid as string, totalPoints); // 更新数据库中测验的总分
+      });
+
+      // 更新 Quiz 总分
+      await updateQuizPoints(qid as string, totalPoints);
+
       alert("Questions Saved!");
     } catch (err) {
       console.error("Failed to save questions: ", err);
     }
   };
+
+
 
   const handleCancelAll = async () => {
     // 得到数据库中的问题列表

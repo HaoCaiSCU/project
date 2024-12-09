@@ -26,12 +26,18 @@ export const findQuestion = async (questionId: string) => {
 
 // 更新问题
 export const updateQuestion = async (questionId: string, question: any) => {
+  console.log("Question being created:", questionId, question);
   const response = await axios.put(`${QUESTIONS_API}/${questionId}`, question);
   return response.data;
 };
 
 // 删除问题
 export const deleteQuestion = async (questionId: string) => {
-  const response = await axios.delete(`${QUESTIONS_API}/${questionId}`);
-  return response.data;
+  try {
+    const response = await axios.delete(`${QUESTIONS_API}/${questionId}`);
+    return response.data;
+  } catch (err) {
+    console.error(`Failed to delete question ${questionId}:`, err);
+    throw err;
+  }
 };
