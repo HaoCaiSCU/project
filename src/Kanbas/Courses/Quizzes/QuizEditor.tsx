@@ -31,12 +31,12 @@ export default function QuizEditor() {
         dispatch(setQuizzes(quizzes));
         setEditQuiz(quiz);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
   
     fetchQuizzes();
-  }, [cid, dispatch, quiz]);
+  }, [cid, dispatch]);
   
   const handleSave = async () => {
     dispatch(updateQuiz(editQuiz));
@@ -129,11 +129,22 @@ export default function QuizEditor() {
                   <label htmlFor="quizInstructions" className="form-label">
                     Quiz Instructions
                   </label>
-                  <QuizTextEditor
-                    value={editQuiz.quiz_instructions}
-                    setValue={(e) =>
-                      setEditQuiz({ ...editQuiz, quiz_instructions: e })
-                    }
+                  <textarea
+                      id="quizInstructions"
+                      defaultValue={editQuiz.quiz_instructions}
+                      onChange={(e) => {
+                        const target = e.target as unknown as HTMLInputElement;
+                        console.log("Previous state:", editQuiz.shuffle_answers);
+                        console.log("New value:", target.checked);
+                        setEditQuiz({...editQuiz, quiz_instructions: e.target.value});
+                      }}
+                      className="form-control border"
+                      style={{
+                        borderColor: "#d51a2c",
+                        minHeight: "200px",
+                        fontFamily: "Arial, sans-serif",
+                        fontSize: "14px",
+                      }}
                   />
                 </div>
 
@@ -143,13 +154,13 @@ export default function QuizEditor() {
                     Points
                   </label>
                   <input
-                    id="quizPoints"
-                    defaultValue={editQuiz.points}
-                    onChange={(e) =>
-                      setEditQuiz({ ...editQuiz, points: e.target.value })
-                    }
-                    className="form-control border"
-                    style={{ borderColor: "#d51a2c" }}
+                      id="quizPoints"
+                      defaultValue={editQuiz.points}
+                      onChange={(e) =>
+                          setEditQuiz({...editQuiz, points: e.target.value})
+                      }
+                      className="form-control border"
+                      style={{borderColor: "#d51a2c"}}
                   />
                 </div>
 
