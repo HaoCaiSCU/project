@@ -1,4 +1,3 @@
-import { BsGripVertical } from "react-icons/bs";
 import { IoMdMore } from "react-icons/io";
 import { FaRocket } from "react-icons/fa";
 import GreenCheckmark from "./GreenCheckmark";
