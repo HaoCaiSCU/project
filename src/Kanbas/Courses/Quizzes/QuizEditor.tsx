@@ -1,6 +1,6 @@
 import { IoMdMore } from "react-icons/io";
 import { useParams } from "react-router";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useRef} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IoBan } from "react-icons/io5";
 import { FaCheckCircle } from "react-icons/fa";
@@ -23,22 +23,56 @@ export default function QuizEditor() {
   const quiz = quizzes.find((quiz: any) => quiz._id === qid);
   const [editQuiz, setEditQuiz] = useState(quiz);
   const [detailsTabActive, setDetailsTabActive] = useState(true);
-
+  const editorRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
         const quizzes = await client.findQuizzesForCourse(cid as string);
         dispatch(setQuizzes(quizzes));
-        setEditQuiz(quiz);
+        if (!editQuiz) {
+          const quiz = quizzes.find((q: any) => q._id === qid);
+          setEditQuiz(quiz);
+        }
       } catch (err) {
         console.error(err);
       }
     };
-  
+
     fetchQuizzes();
-  }, [cid, dispatch]);
-  
+  }, [cid, dispatch, qid, editQuiz]);
+
+  useEffect(() => {
+    if (editorRef.current || !editQuiz) return; // Prevent multiple initializations or if editQuiz is undefined
+
+    const quill = new Quill("#quizInstructionsEditor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          [{ color: [] }, { background: [] }],
+          ["link", "image"],
+          ["clean"],
+        ],
+      },
+    });
+
+    editorRef.current = quill;
+
+    // Load existing instructions into the editor
+    quill.clipboard.dangerouslyPasteHTML(editQuiz.quiz_instructions || "");
+
+    // Update state on text change
+    quill.on("text-change", () => {
+      setEditQuiz({
+        ...editQuiz,
+        quiz_instructions: quill.root.innerHTML, // Extract HTML content
+      });
+    });
+  }, [editQuiz]);
+
   const handleSave = async () => {
     dispatch(updateQuiz(editQuiz));
     await client.updateQuiz(editQuiz);
@@ -48,11 +82,11 @@ export default function QuizEditor() {
   const handleSaveAndPublish = async () => {
     try {
       const updatedQuiz = { ...editQuiz, status: true };
-      await client.updateQuiz(updatedQuiz); // Use the existing updateQuiz method
-      dispatch(updateQuiz(updatedQuiz)); // Update the state with the new quiz status
+      await client.updateQuiz(updatedQuiz);
+      dispatch(updateQuiz(updatedQuiz));
       navigate(`/Kanbas/Courses/${cid}/Quizzes`);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -60,94 +94,86 @@ export default function QuizEditor() {
     navigate(`/Kanbas/Courses/${cid}/Quizzes`);
   };
 
-
   const totalPoints = useSelector((state: any) => state.questionsReducer.totalPoints);
 
   return (
-    <div>
-      {editQuiz && (
-        <div className="container">
-          <div className="d-flex gap-3 justify-content-end align-items-center">
+      <div>
+        {editQuiz && (
+            <div className="container">
+              <div className="d-flex gap-3 justify-content-end align-items-center">
             <span>
               <b>Points:</b> {totalPoints}
             </span>
-            {quiz?.status ? (
-              <span>
+                {quiz?.status ? (
+                    <span>
                 <FaCheckCircle color="green" className="me-3" />
                 Published
               </span>
-            ) : (
-              <span>
+                ) : (
+                    <span>
                 <IoBan color="gray" className="me-3" />
                 Not Published
               </span>
-            )}
-            <button className="btn btn-light">
-              <IoMdMore color="gray" />
-            </button>
-          </div>
+                )}
+                <button className="btn btn-light">
+                  <IoMdMore color="gray" />
+                </button>
+              </div>
 
-          <nav className="nav nav-tabs mt-3">
-            <Link
-              className={`nav-link ${detailsTabActive ? "active" : ""}`}
-              to={""}
-              style={{ color: detailsTabActive ? "black" : "#d51a2c" }}
-              onClick={() => setDetailsTabActive(true)}
-            >
-              Details
-            </Link>
-            <Link
-              className={`nav-link ${!detailsTabActive ? "active" : ""}`}
-              to={""}
-              style={{ color: !detailsTabActive ? "black" : "#d51a2c" }}
-              onClick={() => setDetailsTabActive(false)}
-            >
-              Questions
-            </Link>
-          </nav>
+              <nav className="nav nav-tabs mt-3">
+                <Link
+                    className={`nav-link ${detailsTabActive ? "active" : ""}`}
+                    to={""}
+                    style={{ color: detailsTabActive ? "black" : "#d51a2c" }}
+                    onClick={() => setDetailsTabActive(true)}
+                >
+                  Details
+                </Link>
+                <Link
+                    className={`nav-link ${!detailsTabActive ? "active" : ""}`}
+                    to={""}
+                    style={{ color: !detailsTabActive ? "black" : "#d51a2c" }}
+                    onClick={() => setDetailsTabActive(false)}
+                >
+                  Questions
+                </Link>
+              </nav>
 
-          <div className="container mt-3">
-            {detailsTabActive ? (
-                <div>
-                  {/* Title */}
-                  <div className="mb-3">
-                    <label htmlFor="quizTitle" className="form-label">
-                      Title
-                    </label>
-                    <input
-                        id="quizTitle"
-                        defaultValue={editQuiz.title}
-                        onChange={(e) =>
-                            setEditQuiz({...editQuiz, title: e.target.value})
-                        }
-                        className="form-control border"
-                        style={{borderColor: "#d51a2c"}}
-                    />
-                  </div>
+              <div className="container mt-3">
+                {detailsTabActive ? (
+                    <div>
+                      {/* Title */}
+                      <div className="mb-3">
+                        <label htmlFor="quizTitle" className="form-label">
+                          Title
+                        </label>
+                        <input
+                            id="quizTitle"
+                            defaultValue={editQuiz.title}
+                            onChange={(e) =>
+                                setEditQuiz({ ...editQuiz, title: e.target.value })
+                            }
+                            className="form-control border"
+                            style={{ borderColor: "#d51a2c" }}
+                        />
+                      </div>
 
-                  {/* Quiz Instructions */}
-                  <div className="mb-3">
-                    <label htmlFor="quizInstructions" className="form-label">
-                      Quiz Instructions
-                    </label>
-                    <textarea
-                        id="quizInstructions"
-                        defaultValue={editQuiz.quiz_instructions}
-                        onChange={(e) => {
-                          const target = e.target as unknown as HTMLInputElement;
-                          console.log("Previous state:", editQuiz.shuffle_answers);
-                          console.log("New value:", target.checked);
-                          setEditQuiz({...editQuiz, quiz_instructions: e.target.value});
-                        }}
-                        className="form-control border"
-                        style={{
-                          borderColor: "#d51a2c",
-                          minHeight: "200px",
-                          fontFamily: "Arial, sans-serif",
-                          fontSize: "14px",
-                        }}
-                    />
-                  </div>
+                      {/* Quiz Instructions */}
+                      <div className="mb-3">
+                        <label htmlFor="quizInstructionsEditor" className="form-label">
+                          Quiz Instructions
+                        </label>
+                        <div
+                            id="quizInstructionsEditor"
+                            style={{
+                              border: "1px solid #d51a2c",
+                              borderRadius: "5px",
+                              minHeight: "200px",
+                              fontFamily: "Arial, sans-serif",
+                              fontSize: "14px",
+                            }}
+                        ></div>
+                      </div>
 
                   {/* Points */}
                   <div className="row mb-3">
