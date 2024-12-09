@@ -107,260 +107,248 @@ export default function QuizEditor() {
 
           <div className="container mt-3">
             {detailsTabActive ? (
-              <div>
-                {/* Title */}
-                <div className="mb-3">
-                  <label htmlFor="quizTitle" className="form-label">
-                    Title
-                  </label>
-                  <input
-                    id="quizTitle"
-                    defaultValue={editQuiz.title}
-                    onChange={(e) =>
-                      setEditQuiz({ ...editQuiz, title: e.target.value })
-                    }
-                    className="form-control border"
-                    style={{ borderColor: "#d51a2c" }}
-                  />
-                </div>
+                <div>
+                  {/* Title */}
+                  <div className="mb-3">
+                    <label htmlFor="quizTitle" className="form-label">
+                      Title
+                    </label>
+                    <input
+                        id="quizTitle"
+                        defaultValue={editQuiz.title}
+                        onChange={(e) =>
+                            setEditQuiz({...editQuiz, title: e.target.value})
+                        }
+                        className="form-control border"
+                        style={{borderColor: "#d51a2c"}}
+                    />
+                  </div>
 
-                {/* Quiz Instructions */}
-                <div className="mb-3">
-                  <label htmlFor="quizInstructions" className="form-label">
-                    Quiz Instructions
-                  </label>
-                  <textarea
-                      id="quizInstructions"
-                      defaultValue={editQuiz.quiz_instructions}
-                      onChange={(e) => {
-                        const target = e.target as unknown as HTMLInputElement;
-                        console.log("Previous state:", editQuiz.shuffle_answers);
-                        console.log("New value:", target.checked);
-                        setEditQuiz({...editQuiz, quiz_instructions: e.target.value});
-                      }}
-                      className="form-control border"
-                      style={{
-                        borderColor: "#d51a2c",
-                        minHeight: "200px",
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "14px",
-                      }}
-                  />
-                </div>
+                  {/* Quiz Instructions */}
+                  <div className="mb-3">
+                    <label htmlFor="quizInstructions" className="form-label">
+                      Quiz Instructions
+                    </label>
+                    <textarea
+                        id="quizInstructions"
+                        defaultValue={editQuiz.quiz_instructions}
+                        onChange={(e) => {
+                          const target = e.target as unknown as HTMLInputElement;
+                          console.log("Previous state:", editQuiz.shuffle_answers);
+                          console.log("New value:", target.checked);
+                          setEditQuiz({...editQuiz, quiz_instructions: e.target.value});
+                        }}
+                        className="form-control border"
+                        style={{
+                          borderColor: "#d51a2c",
+                          minHeight: "200px",
+                          fontFamily: "Arial, sans-serif",
+                          fontSize: "14px",
+                        }}
+                    />
+                  </div>
 
-                {/* Points */}
-                <div className="mb-3">
-                  <label htmlFor="quizTitle" className="form-label">
-                    Points
-                  </label>
-                  <input
-                      id="quizPoints"
-                      defaultValue={editQuiz.points}
-                      onChange={(e) =>
-                          setEditQuiz({...editQuiz, points: e.target.value})
-                      }
-                      className="form-control border"
-                      style={{borderColor: "#d51a2c"}}
-                  />
-                </div>
+                  {/* Points */}
+                  <div className="mb-3">
+                    <label htmlFor="quizTitle" className="form-label">
+                      Points
+                    </label>
+                    <input
+                        id="quizPoints"
+                        defaultValue={editQuiz.points}
+                        onChange={(e) =>
+                            setEditQuiz({...editQuiz, points: e.target.value})
+                        }
+                        className="form-control border"
+                        style={{borderColor: "#d51a2c"}}
+                    />
+                  </div>
 
-                {/* Type */}
-                <div className="mb-3">
-                  <label htmlFor="quizType" className="form-label">
-                    Quiz Type
-                  </label>
-                  <select
-                    id="quizType"
-                    defaultValue={editQuiz.quiz_type}
-                    onChange={(e) =>
-                      setEditQuiz({ ...editQuiz, quiz_type: e.target.value })
-                    }
-                    className="form-select"
-                  >
-                    <option value="Graded Quiz">Graded Quiz</option>
-                    <option value="Practice Quiz">Practice Quiz</option>
-                    <option value="Graded Survey">Graded Survey</option>
-                    <option value="Ungraded Survey">Ungraded Survey</option>
-                  </select>
-
-                  {/* Assignment Group */}
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="assignmentGroup" className="form-label">
-                    Assignment Group
-                  </label>
-                  <select
-                    id="assignmentGroup"
-                    defaultValue={editQuiz.assignment_group}
-                    onChange={(e) =>
-                      setEditQuiz({
-                        ...editQuiz,
-                        assignment_group: e.target.value,
-                      })
-                    }
-                    className="form-select"
-                  >
-                    <option value="Quizzes">Quizzes</option>
-                    <option value="Exams">Exams</option>
-                    <option value="Assignments">Assignments</option>
-                    <option value="Project">Project</option>
-                  </select>
-                </div>
-
-                {/* Shuffle */}
-                <div className="form-check mb-3">
-                  <input
-                    id="shuffleAnswers"
-                    type="checkbox"
-                    checked={editQuiz.shuffle_answers}
-                    onChange={(e) =>
-                      setEditQuiz({
-                        ...editQuiz,
-                        shuffle_answers: e.target.checked,
-                      })
-                    }
-                    className="form-check-input"
-                  />
-                  <label className="form-check-label" htmlFor="shuffleAnswers">
-                    Shuffle Answers
-                  </label>
-                </div>
-
-                {/* Time Limit */}
-                <div className="mb-3">
-                  <label htmlFor="timeLimit" className="form-label">
-                    Time Limit (minutes)
-                  </label>
-                  <input
-                    id="timeLimit"
-                    type="number"
-                    value={editQuiz.time_limit}
-                    onChange={(e) =>
-                      setEditQuiz({ ...editQuiz, time_limit: e.target.value })
-                    }
-                    className="form-control"
-                  />
-                </div>
-
-                {/* Multiple Attempts */}
-                <div className="form-check mb-3">
-                  <input
-                    id="multipleAttempts"
-                    type="checkbox"
-                    checked={editQuiz.multiple_attempts}
-                    onChange={(e) =>
-                      setEditQuiz({
-                        ...editQuiz,
-                        multiple_attempts: e.target.checked,
-                      })
-                    }
-                    className="form-check-input"
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="multipleAttempts"
-                  >
-                    Allow Multiple Attempts
-                  </label>
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="assignInput" className="form-label">
-                    Assign
-                  </label>
-                  <div className="d-flex align-items-center border rounded p-2">
-                    <div
-                      style={{ backgroundColor: "#c7cdd1" }}
-                      className="ps-2  me-2"
+                  {/* Type */}
+                  <div className="mb-3">
+                    <label htmlFor="quizType" className="form-label">
+                      Quiz Type
+                    </label>
+                    <select
+                        id="quizType"
+                        defaultValue={editQuiz.quiz_type}
+                        onChange={(e) =>
+                            setEditQuiz({...editQuiz, quiz_type: e.target.value})
+                        }
+                        className="form-select"
                     >
-                      Everyone
-                      <button
-                        type="button"
-                        className="btn-close ms-2"
-                        aria-label="Close"
-                      ></button>
+                      <option value="Graded Quiz">Graded Quiz</option>
+                      <option value="Practice Quiz">Practice Quiz</option>
+                      <option value="Graded Survey">Graded Survey</option>
+                      <option value="Ungraded Survey">Ungraded Survey</option>
+                    </select>
+
+                    {/* Assignment Group */}
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="assignmentGroup" className="form-label">
+                      Assignment Group
+                    </label>
+                    <select
+                        id="assignmentGroup"
+                        defaultValue={editQuiz.assignment_group}
+                        onChange={(e) =>
+                            setEditQuiz({
+                              ...editQuiz,
+                              assignment_group: e.target.value,
+                            })
+                        }
+                        className="form-select"
+                    >
+                      <option value="Quizzes">Quizzes</option>
+                      <option value="Exams">Exams</option>
+                      <option value="Assignments">Assignments</option>
+                      <option value="Project">Project</option>
+                    </select>
+                  </div>
+
+                  {/* Shuffle */}
+                  <div className="form-check mb-3">
+                    <input
+                        id="shuffleAnswers"
+                        type="checkbox"
+                        checked={editQuiz.shuffle_answers}
+                        onChange={(e) =>
+                            setEditQuiz({
+                              ...editQuiz,
+                              shuffle_answers: e.target.checked,
+                            })
+                        }
+                        className="form-check-input"
+                    />
+                    <label className="form-check-label" htmlFor="shuffleAnswers">
+                      Shuffle Answers
+                    </label>
+                  </div>
+
+                  {/* Time Limit */}
+                  <div className="mb-3">
+                    <label htmlFor="timeLimit" className="form-label">
+                      Time Limit (minutes)
+                    </label>
+                    <input
+                        id="timeLimit"
+                        type="number"
+                        value={editQuiz.time_limit}
+                        onChange={(e) =>
+                            setEditQuiz({...editQuiz, time_limit: e.target.value})
+                        }
+                        className="form-control"
+                    />
+                  </div>
+
+                  {/* Multiple Attempts */}
+                  <div className="form-check mb-3">
+                    <input
+                        id="multipleAttempts"
+                        type="checkbox"
+                        checked={editQuiz.multiple_attempts}
+                        onChange={(e) =>
+                            setEditQuiz({
+                              ...editQuiz,
+                              multiple_attempts: e.target.checked,
+                            })
+                        }
+                        className="form-check-input"
+                    />
+                    <label
+                        className="form-check-label"
+                        htmlFor="multipleAttempts"
+                    >
+                      Allow Multiple Attempts
+                    </label>
+                  </div>
+
+                  <div className="row mb-3">
+                    {/* Assign */}
+                    <div className="col-md-3 text-end">
+                      <label htmlFor="assignInput">Assign</label>
                     </div>
-                    <input
-                      id="assignInput"
-                      type="text"
-                      className="border-0 flex-grow-1"
-                      placeholder=""
-                      disabled
-                    />
+                    <div className="col-md-9">
+                      <div className="border p-3">
+                        <div className="mb-3">
+                          <label htmlFor="assignInput">Assign to</label>
+                          <input id="wd-assign-to" className="form-control" value="Everyone"/>
+                        </div>
+
+                        {/* Due */}
+                        <div className="mb-3">
+                          <label htmlFor="dueDate">Due</label>
+                          <input
+                              id="dueDate"
+                              type="datetime-local"
+                              defaultValue={new Date(editQuiz.due_date)
+                                  .toISOString()
+                                  .slice(0, 16)}
+                              onChange={(e) =>
+                                  setEditQuiz({...editQuiz, due_date: e.target.value})
+                              }
+                              className="form-control"
+                          />
+                        </div>
+
+                        {/* Available from and Until */}
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <label htmlFor="availableDate">Available from</label>
+                            <input
+                                id="availableDate"
+                                type="datetime-local"
+                                defaultValue={new Date(editQuiz.available_date)
+                                    .toISOString()
+                                    .slice(0, 16)}
+                                onChange={(e) =>
+                                    setEditQuiz({
+                                      ...editQuiz,
+                                      available_date: e.target.value,
+                                    })
+                                }
+                                className="form-control"
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label htmlFor="untilDate">Until</label>
+                            <input
+                                id="untilDate"
+                                type="datetime-local"
+                                defaultValue={new Date(editQuiz.until_date)
+                                    .toISOString()
+                                    .slice(0, 16)}
+                                onChange={(e) =>
+                                    setEditQuiz({...editQuiz, until_date: e.target.value})
+                                }
+                                className="form-control"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-end gap-2">
+                    <button className="btn btn-secondary" onClick={handleCancel}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-primary" onClick={handleSave}>
+                      Save
+                    </button>
+                    <button
+                        className="btn btn-success"
+                        onClick={handleSaveAndPublish}
+                    >
+                      Save and Publish
+                    </button>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="dueDate" className="form-label">
-                    Due
-                  </label>
-                  <input
-                    id="dueDate"
-                    type="datetime-local"
-                    defaultValue={new Date(editQuiz.due_date)
-                      .toISOString()
-                      .slice(0, 16)}
-                    onChange={(e) =>
-                      setEditQuiz({ ...editQuiz, due_date: e.target.value })
-                    }
-                    className="form-control"
-                  />
-                </div>
-                <div className="row ">
-                  <div className="mb-3 col-md-6">
-                    <label htmlFor="availableDate" className="form-label">
-                      Available from
-                    </label>
-                    <input
-                      id="availableDate"
-                      type="datetime-local"
-                      defaultValue={new Date(editQuiz.available_date)
-                        .toISOString()
-                        .slice(0, 16)}
-                      onChange={(e) =>
-                        setEditQuiz({
-                          ...editQuiz,
-                          available_date: e.target.value,
-                        })
-                      }
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="mb-3 col-md-6">
-                    <label htmlFor="untilDate" className="form-label">
-                      Until
-                    </label>
-                    <input
-                      id="untilDate"
-                      type="datetime-local"
-                      defaultValue={new Date(editQuiz.until_date)
-                        .toISOString()
-                        .slice(0, 16)}
-                      onChange={(e) =>
-                        setEditQuiz({ ...editQuiz, until_date: e.target.value })
-                      }
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button className="btn btn-secondary" onClick={handleCancel}>
-                    Cancel
-                  </button>
-                  <button className="btn btn-primary" onClick={handleSave}>
-                    Save
-                  </button>
-                  <button
-                    className="btn btn-success"
-                    onClick={handleSaveAndPublish}
-                  >
-                    Save and Publish
-                  </button>
-                </div>
-              </div>
             ) : (
-              <div>
-                <QuestionsEditor />
-              </div>
+                <div>
+                  <QuestionsEditor/>
+                </div>
             )}
           </div>
         </div>
