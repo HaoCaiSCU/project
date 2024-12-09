@@ -4,12 +4,17 @@ const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
 const QUIZZES_API = `${REMOTE_SERVER}/api/quizzes`;
 
 export const postAttempt = async (attempt:any) => {
+  if (!attempt.quiz_id || !attempt.answers) {
+    console.error("Invalid attempt data:", attempt);
+    throw new Error("Attempt data is invalid.");
+  }
   try {
     const quizId = attempt.quiz_id;
     const response = await axios.post(`${QUIZZES_API}/${quizId}/newAttempt`, attempt);
     return response.data;
   } catch (err) {
     console.error("Failed to submit answers:", err);
+    throw err;
   }
 }
 
