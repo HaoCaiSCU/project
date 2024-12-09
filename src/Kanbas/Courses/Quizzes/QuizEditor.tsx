@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IoBan } from "react-icons/io5";
 import { FaCheckCircle } from "react-icons/fa";
-import QuizTextEditor from "./QuizTextEditor";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import { Link, useNavigate } from "react-router-dom";
 import * as client from "./client";
 import {
@@ -149,120 +150,192 @@ export default function QuizEditor() {
                   </div>
 
                   {/* Points */}
-                  <div className="mb-3">
-                    <label htmlFor="quizTitle" className="form-label">
-                      Points
-                    </label>
-                    <input
-                        id="quizPoints"
-                        defaultValue={editQuiz.points}
-                        onChange={(e) =>
-                            setEditQuiz({...editQuiz, points: e.target.value})
-                        }
-                        className="form-control border"
-                        style={{borderColor: "#d51a2c"}}
-                    />
+                  <div className="row mb-3">
+                    <div className="col-md-3 text-end">
+                      <label htmlFor="quizPoints">Points</label>
+                    </div>
+                    <div className="col-md-9">
+                      <input
+                          id="quizPoints"
+                          type="number" /* 确保输入为数字 */
+                          defaultValue={editQuiz.points}
+                          onChange={(e) =>
+                              setEditQuiz({ ...editQuiz, points: e.target.value })
+                          }
+                          className="form-control"
+                          style={{ borderColor: "#d51a2c" }}
+                      />
+                    </div>
                   </div>
 
                   {/* Type */}
-                  <div className="mb-3">
-                    <label htmlFor="quizType" className="form-label">
-                      Quiz Type
-                    </label>
-                    <select
-                        id="quizType"
-                        defaultValue={editQuiz.quiz_type}
-                        onChange={(e) =>
-                            setEditQuiz({...editQuiz, quiz_type: e.target.value})
-                        }
-                        className="form-select"
-                    >
-                      <option value="Graded Quiz">Graded Quiz</option>
-                      <option value="Practice Quiz">Practice Quiz</option>
-                      <option value="Graded Survey">Graded Survey</option>
-                      <option value="Ungraded Survey">Ungraded Survey</option>
-                    </select>
-
-                    {/* Assignment Group */}
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="assignmentGroup" className="form-label">
-                      Assignment Group
-                    </label>
-                    <select
-                        id="assignmentGroup"
-                        defaultValue={editQuiz.assignment_group}
-                        onChange={(e) =>
-                            setEditQuiz({
-                              ...editQuiz,
-                              assignment_group: e.target.value,
-                            })
-                        }
-                        className="form-select"
-                    >
-                      <option value="Quizzes">Quizzes</option>
-                      <option value="Exams">Exams</option>
-                      <option value="Assignments">Assignments</option>
-                      <option value="Project">Project</option>
-                    </select>
+                  <div className="row mb-3">
+                    <div className="col-md-3 text-end">
+                      <label htmlFor="quizType" className="form-label">
+                        Quiz Type
+                      </label>
+                    </div>
+                    <div className="col-md-9">
+                      <select
+                          id="quizType"
+                          defaultValue={editQuiz.quiz_type}
+                          onChange={(e) =>
+                              setEditQuiz({...editQuiz, quiz_type: e.target.value})
+                          }
+                          className="form-select"
+                      >
+                        <option value="Graded Quiz">Graded Quiz</option>
+                        <option value="Practice Quiz">Practice Quiz</option>
+                        <option value="Graded Survey">Graded Survey</option>
+                        <option value="Ungraded Survey">Ungraded Survey</option>
+                      </select>
+                    </div>
                   </div>
 
-                  {/* Shuffle */}
-                  <div className="form-check mb-3">
-                    <input
-                        id="shuffleAnswers"
-                        type="checkbox"
-                        checked={editQuiz.shuffle_answers}
-                        onChange={(e) =>
-                            setEditQuiz({
-                              ...editQuiz,
-                              shuffle_answers: e.target.checked,
-                            })
-                        }
-                        className="form-check-input"
-                    />
-                    <label className="form-check-label" htmlFor="shuffleAnswers">
-                      Shuffle Answers
-                    </label>
+                  {/* Assignment Group */}
+                  <div className="row mb-3">
+                    <div className="col-md-3 text-end">
+                      <label htmlFor="assignmentGroup" className="form-label">
+                        Assignment Group
+                      </label>
+                    </div>
+                    <div className="col-md-9">
+                      <select
+                          id="assignmentGroup"
+                          defaultValue={editQuiz.assignment_group}
+                          onChange={(e) =>
+                              setEditQuiz({
+                                ...editQuiz,
+                                assignment_group: e.target.value,
+                              })
+                          }
+                          className="form-select"
+                      >
+                        <option value="Quizzes">Quizzes</option>
+                        <option value="Exams">Exams</option>
+                        <option value="Assignments">Assignments</option>
+                        <option value="Project">Project</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Options Title */}
+                  <div className="row mb-3">
+                    <div className="col-md-3 text-end">
+                    </div>
+                    <div className="col-md-9">
+                      <span style={{ fontWeight: "bold", color: "black" }}>Options</span>
+                    </div>
+                  </div>
+
+                  {/* Shuffle Answers */}
+                  <div className="row mb-3 align-items-center">
+                    <div className="col-md-3 text-end">
+                      <input
+                          id="shuffleAnswers"
+                          type="checkbox"
+                          checked={editQuiz.shuffle_answers}
+                          onChange={(e) =>
+                              setEditQuiz({
+                                ...editQuiz,
+                                shuffle_answers: e.target.checked,
+                              })
+                          }
+                          className="form-check-input"
+                      />
+                    </div>
+                    <div className="col-md-9">
+                      <label
+                          className="form-check-label"
+                          htmlFor="shuffleAnswers"
+                      >
+                        Shuffle Answers
+                      </label>
+                    </div>
                   </div>
 
                   {/* Time Limit */}
-                  <div className="mb-3">
-                    <label htmlFor="timeLimit" className="form-label">
-                      Time Limit (minutes)
-                    </label>
-                    <input
-                        id="timeLimit"
-                        type="number"
-                        value={editQuiz.time_limit}
-                        onChange={(e) =>
-                            setEditQuiz({...editQuiz, time_limit: e.target.value})
-                        }
-                        className="form-control"
-                    />
+                  <div className="row mb-3 align-items-center">
+                    <div className="col-md-3 text-end">
+                      <input
+                          id="timeLimitEnabled"
+                          type="checkbox"
+                          checked={editQuiz.time_limit_enabled}
+                          onChange={(e) =>
+                              setEditQuiz({
+                                ...editQuiz,
+                                time_limit_enabled: e.target.checked,
+                              })
+                          }
+                          className="form-check-input"
+                      />
+                    </div>
+                    <div className="col-md-9">
+                      <div className="row align-items-center">
+                        <div className="col-auto"> {/* Time Limit 字段缩短宽度 */}
+                          <label
+                              className="form-label mb-0"
+                              htmlFor="timeLimit"
+                              style={{ marginRight: "5px" }} /* 减少与后面输入框的间距 */
+                          >
+                            Time Limit
+                          </label>
+                        </div>
+                        <div className="col-auto">
+                          <input
+                              id="timeLimit"
+                              type="number"
+                              value={editQuiz.time_limit}
+                              onChange={(e) =>
+                                  setEditQuiz({ ...editQuiz, time_limit: e.target.value })
+                              }
+                              className="form-control"
+                              style={{ width: "80px" }}
+                          />
+                        </div>
+                        <div className="col-auto"> {/* Minutes 字段紧贴输入框 */}
+                          <span style={{ marginLeft: "0px" }}>Minutes</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Multiple Attempts */}
-                  <div className="form-check mb-3">
-                    <input
-                        id="multipleAttempts"
-                        type="checkbox"
-                        checked={editQuiz.multiple_attempts}
-                        onChange={(e) =>
-                            setEditQuiz({
-                              ...editQuiz,
-                              multiple_attempts: e.target.checked,
-                            })
-                        }
-                        className="form-check-input"
-                    />
-                    <label
-                        className="form-check-label"
-                        htmlFor="multipleAttempts"
-                    >
-                      Allow Multiple Attempts
-                    </label>
+                  {/* Allow Multiple Attempts */}
+                  <div
+                      className="row mb-3"
+                      style={{
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                        padding: "10px",
+                        backgroundColor: "#fff",
+                        marginLeft: "calc(11rem)",
+                        marginRight: "calc(0.1rem)",
+                      }}
+                  >
+                    <div className="col-md-1 text-end">
+                      <input
+                          id="multipleAttempts"
+                          type="checkbox"
+                          checked={editQuiz.multiple_attempts}
+                          onChange={(e) =>
+                              setEditQuiz({
+                                ...editQuiz,
+                                multiple_attempts: e.target.checked,
+                              })
+                          }
+                          className="form-check-input"
+                      />
+                    </div>
+                    <div className="col-md-9">
+                      <label
+                          className="form-check-label"
+                          htmlFor="multipleAttempts"
+                      >
+                        Allow Multiple Attempts
+                      </label>
+                    </div>
                   </div>
+
 
                   <div className="row mb-3">
                     {/* Assign */}
