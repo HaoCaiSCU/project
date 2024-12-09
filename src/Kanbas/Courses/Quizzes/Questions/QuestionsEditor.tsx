@@ -6,16 +6,17 @@ import * as client from "./clients";
 import { updateQuizPoints } from "../client";
 import { setQuestions, addQuestion, deleteQuestion, updateQuestion } from "./reducer";
 
+import { Question } from "./reducer"; // 从 reducer 文件导出 Question 接口
+
 export default function QuestionsEditor() {
   const { qid } = useParams();
   const dispatch = useDispatch();
-  const questions = useSelector((state: any) => state.questionsReducer.questions);
+  const questions = useSelector((state: any) => state.questionsReducer.questions) as Question[];
   const totalPoints = useSelector((state: any) => state.questionsReducer.totalPoints);
 
-  const [deletedQuestions, setDeletedQuestions] = useState<any[]>([]); // 用于保存已删除的问题，以便保存时删除数据库中的问题
+  const [deletedQuestions, setDeletedQuestions] = useState<Question[]>([]);
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<any>(null);
-
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -26,117 +27,138 @@ export default function QuestionsEditor() {
         console.error("Failed to fetch questions: ", err);
       }
     };
-  
     fetchQuestions();
   }, [qid, dispatch]);
 
-  const handleDelete = (questionId: string) => {
-    const question = questions.find((q: any) => q._id === questionId);
-
-    if (question?._id) {
-      // 如果问题已存在于数据库，移除它并加入 `deletedQuestions`
-      dispatch(deleteQuestion(questionId));
-      setDeletedQuestions((prev) => [...prev, question]);
-    } else {
-      // 如果问题是新添加的，仅从 Redux 状态中移除
-      dispatch(deleteQuestion(questionId));
-    }
-  };
-
-
+  // 处理新问题创建
   const handleNewQuestionClick = () => {
     setIsAddingQuestion(true);
     setEditingQuestion(null);
   };
 
+  // 取消操作
   const handleCancel = () => {
     setIsAddingQuestion(false);
     setEditingQuestion(null);
   };
 
-  const handleSave = (question: any) => {
-    const updatedQuestion = {
+  // 保存单个问题
+  const handleSave = (question: Partial<Question>) => {
+    const updatedQuestion: Question = {
       ...question,
-      _id: question._id || `temp-${Date.now()}`, // 如果没有 _id，则生成一个临时 ID
+      _id: question._id || `temp-${Date.now()}`,
+      title: question.title || "Untitled Question",
+      points: question.points || 0,
+      type: question.type || "multiple_choice",
+      question: question.question || "",
+      choices: question.choices || [],
+      answer: question.answer || "",
+      is_true: question.type === "true_false" ? question.is_true || false : undefined,
+      possible_answers: question.type === "fill_in_blanks" ? question.possible_answers || [] : undefined,
     };
 
     if (editingQuestion) {
-      dispatch(updateQuestion(updatedQuestion)); // 更新 Redux 状态
+      dispatch(updateQuestion(updatedQuestion));
     } else {
-      dispatch(addQuestion(updatedQuestion)); // 添加到 Redux 状态
+      dispatch(addQuestion(updatedQuestion));
     }
 
     setIsAddingQuestion(false);
     setEditingQuestion(null);
   };
 
-  const handleEdit = (question: any) => {
+  // 编辑问题
+  const handleEdit = (question: Question) => {
     setEditingQuestion(question);
     setIsAddingQuestion(true);
   };
 
+  // 删除问题
+  const handleDelete = (questionId: string) => {
+    const question = questions.find((q) => q._id === questionId);
+
+    if (question?._id && !question._id.startsWith("temp-")) {
+      setDeletedQuestions((prev) => [...prev, question]);
+    }
+    dispatch(deleteQuestion(questionId));
+  };
+
+  // 映射问题字段为后端支持的格式
+  const formatQuestionForBackend = (question: Question) => {
+    return {
+      quiz_id: qid,
+      type: question.type,
+      title: question.title,
+      points: question.points,
+      question: question.question,
+      possible_answers: question.type === "fill_in_blanks" ? question.possible_answers || [] : undefined,
+      choices: question.type === "multiple_choice" ? question.choices || [] : undefined,
+      is_true: question.type === "true_false" ? question.is_true : undefined,
+    };
+  };
+
+  // 保存所有问题
   const handleSaveAll = async () => {
     try {
-      // 保存新增和更新的问题
       await Promise.all(
-          questions.map((question: any) => {
-            if (question._id) {
-              // 如果问题已有 `_id`，调用更新接口
-              return client.updateQuestion(question._id, question);
+          questions.map((question) => {
+            const formattedQuestion = {
+              quiz_id: qid,
+              type: question.type, // 直接使用 question.type
+              title: question.title,
+              points: question.points,
+              question: question.question,
+              possible_answers: question.type === "fill_in_blanks" ? question.possible_answers || [] : undefined,
+              choices: question.type === "multiple_choice" ? question.choices || [] : undefined,
+              is_true: question.type === "true_false" ? question.is_true || false : undefined,
+            };
+
+            if (question._id && !question._id.startsWith("temp-")) {
+              return client.updateQuestion(question._id, formattedQuestion);
             } else {
-              // 如果问题是新添加的，调用创建接口
-              return client.createQuestion(qid as string, question);
+              return client.createQuestion(qid as string, formattedQuestion);
             }
           })
       );
 
-      // 删除标记为删除的问题
-      const deleteResults = await Promise.allSettled(
-          deletedQuestions.map((question: any) =>
-              client.deleteQuestion(question._id)
-          )
+      await Promise.allSettled(
+          deletedQuestions.map((question) => client.deleteQuestion(question._id))
       );
 
-      // 记录删除失败的条目
-      deleteResults.forEach((result, index) => {
-        if (result.status === "rejected") {
-          console.error(
-              `Failed to delete question: ${deletedQuestions[index]._id}`,
-              result.reason
-          );
-        }
-      });
-
-      // 更新 Quiz 总分
-      await updateQuizPoints(qid as string, totalPoints);
-
+      await updateQuizPoints(qid as string, totalPoints); // 更新总分
       alert("Questions Saved!");
     } catch (err) {
-      console.error("Failed to save questions: ", err);
+      console.error("Failed to save questions:", err);
     }
   };
 
 
-
+  // 取消所有更改
   const handleCancelAll = async () => {
-    // 得到数据库中的问题列表
-    const questions = await client.findQuestionsByQuizId(qid as string);
-    // 用数据库状态覆盖全局状态
-    dispatch(setQuestions(questions));
-    setDeletedQuestions([]); // 清空已删除的问题
-    // navigate(`/Kanbas/Courses/${cid}/Quizzes`);
-    alert("Changes Canceled!");
+    try {
+      const fetchedQuestions = await client.findQuestionsByQuizId(qid as string);
+      dispatch(setQuestions(fetchedQuestions));
+      setDeletedQuestions([]);
+      alert("Changes Canceled!");
+    } catch (err) {
+      console.error("Failed to cancel changes:", err);
+    }
   };
 
   return (
       <div>
         <ul id="wd-questions" className="list-group rounded-0">
-          {questions.map((question: any) => (
+          {questions.map((question) => (
               <li key={question._id} className="list-group-item">
                 <div className="d-flex justify-content-between">
                   <div>{question.title}</div>
                   <div>
-                    <button className="btn btn-sm btn-warning me-2" onClick={() => handleEdit(question)}>Edit</button>
+                    <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => handleEdit(question)}
+                    >
+                      Edit
+                    </button>
                     <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(question._id)}
@@ -149,28 +171,32 @@ export default function QuestionsEditor() {
           ))}
         </ul>
         {isAddingQuestion ? (
-            <QuestionForm
-                question={editingQuestion}
-                onCancel={handleCancel}
-                onSave={handleSave}
-            />
+            <QuestionForm question={editingQuestion} onCancel={handleCancel} onSave={handleSave} />
         ) : (
             <div className="d-flex justify-content-center mt-3">
-              <button onClick={handleNewQuestionClick}
-                      className="btn btn-outline-secondary"
-                      style={{backgroundColor: "#f0f0f0", color: "#333"}}>
+              <button
+                  onClick={handleNewQuestionClick}
+                  className="btn btn-outline-secondary"
+                  style={{ backgroundColor: "#f0f0f0", color: "#333" }}
+              >
                 + New Question
               </button>
             </div>
         )}
-        <hr className="separator"/>
+        <hr className="separator" />
         <div className="mt-3 float-center">
-          <button className="btn btn-secondary me-2" onClick={handleCancelAll}
-                  style={{backgroundColor: "#f0f0f0", color: "#333"}}>
+          <button
+              className="btn btn-secondary me-2"
+              onClick={handleCancelAll}
+              style={{ backgroundColor: "#f0f0f0", color: "#333" }}
+          >
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={handleSaveAll}
-                  style={{color: "#fff", backgroundColor: "#dc3545", border: "1px solid #dc3545"}}>
+          <button
+              className="btn btn-primary"
+              onClick={handleSaveAll}
+              style={{ color: "#fff", backgroundColor: "#dc3545", border: "1px solid #dc3545" }}
+          >
             Save
           </button>
         </div>

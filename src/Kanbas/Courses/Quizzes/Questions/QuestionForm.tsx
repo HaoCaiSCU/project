@@ -211,7 +211,7 @@ const QuestionForm = ({
           >
             <option value="multiple_choice">Multiple Choice</option>
             <option value="true_false">True/False</option>
-            <option value="fill_in_blank">Fill in the Blank</option>
+            <option value="fill_in_blanks">Fill in the Blank</option>
           </select>
           <div className="d-flex justify-content-end">
             <label className="me-1" style={{ fontWeight: "bold" }}>
@@ -244,7 +244,7 @@ const QuestionForm = ({
           </label>
           {type === "multiple_choice" && renderChoices()}
           {type === "true_false" && renderTrueFalse()}
-          {type === "fill_in_blank" && renderFillInTheBlank()}
+          {type === "fill_in_blanks" && renderFillInTheBlank()}
           {type === "multiple_choice" && (
               <button
                   type="button"
